@@ -1,0 +1,31 @@
+package repository
+
+import (
+	"context"
+
+	"github.com/potibm/billedapparat/internal/app/domain"
+)
+
+type ScheduleEntryListFilters struct {
+	Query    *string
+	Category *string
+	ID       *int64
+}
+
+type ScheduleEntryListParams struct {
+	Offset int
+	Limit  int
+	Sort   string
+	Order  string
+}
+
+type ScheduleEntryRepository interface {
+	Save(ctx context.Context, scheduleEntry *domain.ScheduleEntry) error
+	Delete(ctx context.Context, id int64) error
+	List(
+		ctx context.Context,
+		params ScheduleEntryListParams,
+		filters ScheduleEntryListFilters,
+	) ([]domain.ScheduleEntry, int64, error)
+	GetByID(ctx context.Context, id int64) (*domain.ScheduleEntry, error)
+}
