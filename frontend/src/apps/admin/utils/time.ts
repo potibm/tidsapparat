@@ -1,4 +1,6 @@
-export const extractTimeString = (timeVal: any): string => {
+export const extractTimeString = (
+  timeVal: string | Date | number | undefined,
+): string => {
   if (!timeVal) return "00:00";
   if (
     typeof timeVal === "string" &&
@@ -16,7 +18,11 @@ export const extractTimeString = (timeVal: any): string => {
   return "00:00";
 };
 
-export const transformScheduleToAPI = (data: any) => {
+export const transformScheduleToAPI = (data: {
+  start_time_only: string | Date | number;
+  party_day: string;
+  duration_mins: number;
+}) => {
   const cleanTime = extractTimeString(data.start_time_only);
   const startString = `${data.party_day}T${cleanTime}:00`;
   const startDate = new Date(startString);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   SelectInput,
   TimeInput,
@@ -37,13 +37,32 @@ export const TimeSelector = ({
   const startTime = useWatch({ name: "start_time_only" });
   const duration = useWatch({ name: "duration_mins" });
 
-  // 3. State for the live preview
-  const [preview, setPreview] = useState<string>("Waiting for your input...");
+  // 3. Ref to ensure initialization runs only once
+  const initializedRef = useRef(false);
 
-  const [isInitialized, setIsInitialized] = useState(false);
+  // 4. Compute preview directly from watched values
+  const preview = (() => {
+    if (partyDay && startTime && duration !== undefined && duration !== null) {
+      const cleanTime = extractTimeString(startTime);
+      const startStr = `${partyDay}T${cleanTime}:00`;
+      const startDate = new Date(startStr);
+
+      if (!isNaN(startDate.getTime())) {
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        const options: Intl.DateTimeFormatOptions = {
+          weekday: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return `Event ends on: ${endDate.toLocaleString("en-GB", options)}`;
+      }
+    }
+    return "Please fill out the three fields.";
+  })();
 
   useEffect(() => {
-    if (record && record.start_time && !isInitialized) {
+    if (record && record.start_time && !initializedRef.current) {
       const startDate = new Date(record.start_time);
 
       if (!isNaN(startDate.getTime())) {
@@ -62,7 +81,7 @@ export const TimeSelector = ({
           );
         }
 
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           setValue("party_day", loadedDay, {
             shouldDirty: true,
             shouldValidate: true,
@@ -79,35 +98,14 @@ export const TimeSelector = ({
             shouldTouch: true,
           });
         }, 0);
+
+        initializedRef.current = true;
+        return () => clearTimeout(timeoutId);
       }
-      setIsInitialized(true); // Nur einmal ausführen!
+
+      initializedRef.current = true;
     }
-  }, [record, isInitialized, setValue]);
-
-  // 4. Effect to update the preview whenever any of the three fields change
-  useEffect(() => {
-    if (partyDay && startTime && duration !== undefined && duration !== null) {
-      // create an ISO string
-      const cleanTime = extractTimeString(startTime);
-      const startStr = `${partyDay}T${cleanTime}:00`;
-      const startDate = new Date(startStr);
-
-      if (!isNaN(startDate.getTime())) {
-        const endDate = new Date(startDate.getTime() + duration * 60000);
-
-        const options: Intl.DateTimeFormatOptions = {
-          weekday: "short",
-          hour: "2-digit",
-          minute: "2-digit",
-        };
-        setPreview(
-          `Event ends on: ${endDate.toLocaleString("en-GB", options)}`,
-        );
-      }
-    } else {
-      setPreview("Please fill out the three fields.");
-    }
-  }, [partyDay, startTime, duration]);
+  }, [record, setValue]);
 
   return (
     <Box sx={{ mb: 2, p: 2, border: "1px dashed #ccc", borderRadius: 2 }}>

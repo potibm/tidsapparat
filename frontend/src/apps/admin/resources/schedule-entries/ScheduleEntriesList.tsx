@@ -4,7 +4,6 @@ import {
   TextField,
   EditButton,
   DeleteButton,
-  NumberField,
   FunctionField,
   DateField,
 } from "react-admin";
@@ -27,7 +26,11 @@ export const ScheduleEntriesList = () => (
       <FunctionField
         label="Duration"
         sortBy="end_time"
-        render={(record: any) => {
+        render={(record: {
+          start_time?: string;
+          end_time?: string;
+          title?: string;
+        }) => {
           if (!record || !record.start_time || !record.end_time) return "-";
 
           const start = new Date(record.start_time);
