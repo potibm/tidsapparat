@@ -1,5 +1,6 @@
 import { RaRecord } from "react-admin";
 import { CategoryRecord } from "../categories/category.types";
+import { LocationRecord } from "../locations/location.types";
 
 export interface ScheduleEntryRecord extends RaRecord {
   id: string | number;
@@ -8,7 +9,8 @@ export interface ScheduleEntryRecord extends RaRecord {
   end_time: string; // ISO-String aus der DB
   category_id?: number;
   category?: CategoryRecord;
-  location?: string;
+  location_id?: number;
+  location?: LocationRecord;
 }
 
 export interface ScheduleFormData {
@@ -17,6 +19,6 @@ export interface ScheduleFormData {
   duration_mins: number;
   title?: string;
   category_id?: number;
-  location?: string;
+  location_id?: number;
   [key: string]: unknown;
 }

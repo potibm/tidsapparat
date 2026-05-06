@@ -14,7 +14,9 @@ export const ScheduleEntriesInputs = () => {
 
       <TimeSelector partyDays={partyDays} presetDurations={eventDurations} />
 
-      <TextInput source="location" />
+      <ReferenceInput source="location_id" reference="locations">
+        <SelectInput label="Location" optionText="name" />
+      </ReferenceInput>
 
       <ReferenceInput source="category_id" reference="categories">
         <SelectInput label="Category" optionText="name" />

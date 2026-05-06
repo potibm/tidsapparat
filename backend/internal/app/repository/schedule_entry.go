@@ -9,6 +9,7 @@ import (
 type ScheduleEntryListFilters struct {
 	Query      *string
 	CategoryID *int64
+	LocationID *int64
 	ID         *int64
 	HidePast   bool
 }

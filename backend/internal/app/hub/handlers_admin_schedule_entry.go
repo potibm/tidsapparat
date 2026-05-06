@@ -136,6 +136,12 @@ func parseScheduleEntryFilters(c *gin.Context) repository.ScheduleEntryListFilte
 		}
 	}
 
+	if locIDStr := c.Query("location_id"); locIDStr != "" {
+		if locID, err := strconv.ParseInt(locIDStr, 10, 64); err == nil {
+			filters.LocationID = &locID
+		}
+	}
+
 	if idStr := c.Query("id"); idStr != "" {
 		if id, err := strconv.ParseInt(idStr, 10, 64); err == nil {
 			filters.ID = &id

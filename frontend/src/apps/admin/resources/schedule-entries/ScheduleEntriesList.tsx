@@ -33,6 +33,15 @@ const scheduleFilters = [
     <SelectInput label="Category" optionText="name" />
   </ReferenceInput>,
 
+  <ReferenceInput
+    key="location_id"
+    source="location_id"
+    reference="locations"
+    alwaysOn
+  >
+    <SelectInput label="Location" optionText="name" />
+  </ReferenceInput>,
+
   <BooleanInput
     key="hide_past"
     source="hide_past"
@@ -60,7 +69,7 @@ export const ScheduleEntriesList = () => (
     <DatagridConfigurable
       rowClick="edit"
       bulkActionButtons={false}
-      omit={["end_time_display", "category_id", "location"]}
+      omit={["end_time_display", "category_id", "location_id"]}
     >
       {/* 1. STATUS FIELD */}
       <FunctionField
@@ -148,7 +157,13 @@ export const ScheduleEntriesList = () => (
       />
 
       {/* 5. LOCATION / CATEGORY */}
-      <TextField source="location" label="Location" />
+      <ReferenceField
+        source="location_id"
+        reference="locations"
+        label="Location"
+      >
+        <TextField source="name" />
+      </ReferenceField>
       <ReferenceField
         source="category_id"
         reference="categories"
