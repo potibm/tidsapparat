@@ -4,6 +4,7 @@ import { MyLayout } from "./theme/MyLayout";
 import { dataProvider } from "./providers/dataProvider";
 import scheduleEntries from "./resources/schedule-entries";
 import categories from "./resources/categories";
+import locations from "./resources/locations";
 
 export const AdminApp = () => (
   <Admin
@@ -15,5 +16,6 @@ export const AdminApp = () => (
   >
     <Resource {...scheduleEntries} />
     <Resource {...categories} />
+    <Resource {...locations} />
   </Admin>
 );

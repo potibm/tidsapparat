@@ -65,6 +65,7 @@ func NewServeCmd() *cobra.Command {
 				StaticFiles:       staticFiles,
 				ScheduleEntryRepo: dbStore.NewScheduleEntryRepository(),
 				CategoryRepo:      dbStore.NewCategoryRepository(),
+				LocationRepo:      dbStore.NewLocationRepository(),
 				Cfg:               Cfg,
 			})
 			if err != nil {

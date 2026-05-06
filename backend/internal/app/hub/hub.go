@@ -27,6 +27,8 @@ const (
 	pathScheduleEntriesWithID = "/schedule-entries/:id"
 	pathCategories            = "/categories"
 	pathCategoriesWithID      = "/categories/:id"
+	pathLocations             = "/locations"
+	pathLocationsWithID       = "/locations/:id"
 )
 
 type Config struct {
@@ -34,6 +36,7 @@ type Config struct {
 	StaticFiles       embed.FS
 	ScheduleEntryRepo repository.ScheduleEntryRepository
 	CategoryRepo      repository.CategoryRepository
+	LocationRepo      repository.LocationRepository
 	Cfg               config.Config
 }
 
@@ -42,6 +45,7 @@ type Server struct {
 	staticFiles       embed.FS
 	scheduleEntryRepo repository.ScheduleEntryRepository
 	categoryRepo      repository.CategoryRepository
+	locationRepo      repository.LocationRepository
 	cfg               config.Config
 	logger            *slog.Logger
 }
@@ -54,6 +58,7 @@ func NewServer(cfg Config) (*Server, error) {
 		staticFiles:       cfg.StaticFiles,
 		scheduleEntryRepo: cfg.ScheduleEntryRepo,
 		categoryRepo:      cfg.CategoryRepo,
+		locationRepo:      cfg.LocationRepo,
 		cfg:               cfg.Cfg,
 		logger:            logger.With("component", "HubServer"),
 	}, nil
@@ -128,6 +133,12 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 	admin.GET(pathCategoriesWithID, s.getCategory)
 	admin.PUT(pathCategoriesWithID, s.updateCategory)
 	admin.DELETE(pathCategoriesWithID, s.deleteCategory)
+
+	admin.GET(pathLocations, s.listLocations)
+	admin.POST(pathLocations, s.createLocation)
+	admin.GET(pathLocationsWithID, s.getLocation)
+	admin.PUT(pathLocationsWithID, s.updateLocation)
+	admin.DELETE(pathLocationsWithID, s.deleteLocation)
 
 	r.NoRoute(func(c *gin.Context) {
 		if !strings.HasPrefix(c.Request.RequestURI, "/api") && !strings.Contains(c.Request.RequestURI, ".") {

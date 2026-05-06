@@ -18,6 +18,7 @@ import { Chip } from "@mui/material";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { ScheduleEntryRecord } from "./schedule_entry.types";
+import { LocationWithIcon } from "@admin/components/fields/LocationWithIcon";
 
 dayjs.extend(isBetween);
 
@@ -31,6 +32,15 @@ const scheduleFilters = [
     alwaysOn
   >
     <SelectInput label="Category" optionText="name" />
+  </ReferenceInput>,
+
+  <ReferenceInput
+    key="location_id"
+    source="location_id"
+    reference="locations"
+    alwaysOn
+  >
+    <SelectInput label="Location" optionText="name" />
   </ReferenceInput>,
 
   <BooleanInput
@@ -60,7 +70,7 @@ export const ScheduleEntriesList = () => (
     <DatagridConfigurable
       rowClick="edit"
       bulkActionButtons={false}
-      omit={["end_time_display", "category_id", "location"]}
+      omit={["end_time_display", "category_id", "location_id"]}
     >
       {/* 1. STATUS FIELD */}
       <FunctionField
@@ -148,7 +158,13 @@ export const ScheduleEntriesList = () => (
       />
 
       {/* 5. LOCATION / CATEGORY */}
-      <TextField source="location" label="Location" />
+      <ReferenceField
+        source="location_id"
+        reference="locations"
+        label="Location"
+      >
+        <LocationWithIcon />
+      </ReferenceField>
       <ReferenceField
         source="category_id"
         reference="categories"

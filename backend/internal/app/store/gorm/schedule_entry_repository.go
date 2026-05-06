@@ -50,7 +50,7 @@ func (r *scheduleEntryRepository) List(
 		total     int64
 	)
 
-	query := r.db.WithContext(ctx).Model(&dbScheduleEntry{}).Preload("Category")
+	query := r.db.WithContext(ctx).Model(&dbScheduleEntry{}).Preload("Category").Preload("Location")
 
 	query = r.applyFilters(query, filters)
 
@@ -91,7 +91,7 @@ func (r *scheduleEntryRepository) List(
 func (r *scheduleEntryRepository) GetByID(ctx context.Context, id int64) (*domain.ScheduleEntry, error) {
 	var dbEntry dbScheduleEntry
 
-	err := r.db.WithContext(ctx).Preload("Category").First(&dbEntry, id).Error
+	err := r.db.WithContext(ctx).Preload("Category").Preload("Location").First(&dbEntry, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +109,10 @@ func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.Schedul
 
 	if f.CategoryID != nil {
 		db = db.Where("category_id = ?", *f.CategoryID)
+	}
+
+	if f.LocationID != nil {
+		db = db.Where("location_id = ?", *f.LocationID)
 	}
 
 	if f.ID != nil {

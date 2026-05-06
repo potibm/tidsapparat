@@ -74,6 +74,12 @@ linters:
         linters:
           - gosec
         text: "G101"
+      - path: '.*/handlers_admin_.*\.go$'
+        linters:
+          - dupl
+      - path: '.*/.*_repository\.go$'
+        linters:
+          - dupl
 formatters:
   enable:
     - golines
