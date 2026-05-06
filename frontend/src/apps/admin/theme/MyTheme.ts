@@ -43,6 +43,8 @@ export const MyDarkTheme: ThemeOptions = {
     mode: "dark",
     primary: {
       main: "#BF00FF",
+      light: "#D946EF",
+      dark: "#9300C4",
       contrastText: "#FFFFFF",
     },
     secondary: {
@@ -73,7 +75,30 @@ export const MyDarkTheme: ThemeOptions = {
       styleOverrides: {
         head: {
           backgroundColor: "#0F172A",
-          fontWeight: 700,
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        filledPrimary: {
+          backgroundColor: "#BF00FF",
+          color: "#FFFFFF",
+        },
+        root: {
+          backgroundColor: "rgba(15, 23, 42, 0.6)",
+          border: "1px solid rgba(191, 0, 255, 0.5)",
+        },
+        label: {
+          color: "#E066FF",
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            backgroundColor: "rgba(255, 255, 255, 0.04) !important",
+          },
         },
       },
     },

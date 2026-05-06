@@ -18,6 +18,7 @@ import { Chip } from "@mui/material";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { ScheduleEntryRecord } from "./schedule_entry.types";
+import { LocationWithIcon } from "@admin/components/fields/LocationWithIcon";
 
 dayjs.extend(isBetween);
 
@@ -162,7 +163,7 @@ export const ScheduleEntriesList = () => (
         reference="locations"
         label="Location"
       >
-        <TextField source="name" />
+        <LocationWithIcon />
       </ReferenceField>
       <ReferenceField
         source="category_id"
