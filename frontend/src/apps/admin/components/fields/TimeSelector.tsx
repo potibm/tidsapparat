@@ -10,23 +10,29 @@ import {
 import { useWatch, useFormContext } from "react-hook-form";
 import { Box, Typography, Chip, Stack } from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
-import { extractTimeString } from "@admin/utils/time";
+import { useAppConfig } from "@core/config/useConfig";
+import { Day, Durations } from "@core/config/config.schemas";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
-// Interfaces für the configuration
-interface PartyDay {
-  id: string; // z.B. "2026-05-08"
-  name: string; // z.B. "Freitag"
-}
-
+dayjs.extend(utc);
+dayjs.extend(timezone);
 interface TimeSelectorProps {
-  partyDays: PartyDay[];
-  presetDurations?: number[]; // z.B. [15, 30, 45, 60, 90, 120]
+  partyDays: Day[];
+  presetDurations?: Durations;
 }
 
 export const TimeSelector = ({
   partyDays,
   presetDurations = [15, 30, 60, 90], // Fallback, falls vom Backend nichts kommt
 }: TimeSelectorProps) => {
+  const {
+    date_locale: dateLocale,
+    date_options: dateOptions,
+    timezone: tz,
+  } = useAppConfig();
+
   const record = useRecordContext(); // NEU: Holt sich die Backend-Daten (falls im Edit-View)
 
   // 1. Hook for the quick buttons
@@ -43,42 +49,38 @@ export const TimeSelector = ({
   // 4. Compute preview directly from watched values
   const preview = (() => {
     if (partyDay && startTime && duration !== undefined && duration !== null) {
-      const cleanTime = extractTimeString(startTime);
-      const startStr = `${partyDay}T${cleanTime}:00`;
-      const startDate = new Date(startStr);
+      const cleanTime =
+        String(startTime).length > 5
+          ? dayjs(startTime).format("HH:mm")
+          : startTime;
+      const startObj = dayjs.tz(`${partyDay} ${cleanTime}`, tz);
 
-      if (!isNaN(startDate.getTime())) {
-        const endDate = new Date(startDate.getTime() + duration * 60000);
+      if (startObj.isValid()) {
+        const endDate = startObj.add(duration, "minute");
 
         const options: Intl.DateTimeFormatOptions = {
-          weekday: "short",
-          hour: "2-digit",
-          minute: "2-digit",
+          ...dateOptions,
+          timeZone: tz,
         };
-        return `Event ends on: ${endDate.toLocaleString("en-GB", options)}`;
+
+        return `Event ends on: ${endDate.toDate().toLocaleString(dateLocale, options)}`;
       }
     }
     return "Please fill out the three fields.";
   })();
 
   useEffect(() => {
-    if (record && record.start_time && !initializedRef.current) {
-      const startDate = new Date(record.start_time);
+    if (record?.start_time && !initializedRef.current) {
+      const startObj = dayjs(record.start_time).tz(tz);
 
-      if (!isNaN(startDate.getTime())) {
-        const year = startDate.getFullYear();
-        const month = String(startDate.getMonth() + 1).padStart(2, "0");
-        const day = String(startDate.getDate()).padStart(2, "0");
-
-        const loadedDay = `${year}-${month}-${day}`;
-        const loadedTime = extractTimeString(startDate);
+      if (startObj.isValid()) {
+        const loadedDay = startObj.format("YYYY-MM-DD");
+        const loadedTime = startObj.format("HH:mm");
 
         let diffMins = 60;
         if (record.end_time) {
-          const endDate = new Date(record.end_time);
-          diffMins = Math.round(
-            (endDate.getTime() - startDate.getTime()) / 60000,
-          );
+          const endObj = dayjs(record.end_time).tz(tz);
+          diffMins = endObj.diff(startObj, "minute");
         }
 
         const timeoutId = setTimeout(() => {
@@ -100,12 +102,13 @@ export const TimeSelector = ({
         }, 0);
 
         initializedRef.current = true;
-        return () => clearTimeout(timeoutId);
+        return () => {
+          clearTimeout(timeoutId);
+          initializedRef.current = false;
+        };
       }
-
-      initializedRef.current = true;
     }
-  }, [record, setValue]);
+  }, [record, setValue, tz]);
 
   return (
     <Box sx={{ mb: 2, p: 2, border: "1px dashed #ccc", borderRadius: 2 }}>

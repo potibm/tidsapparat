@@ -1,37 +1,32 @@
-export const extractTimeString = (
-  timeVal: string | Date | number | undefined,
-): string => {
-  if (!timeVal) return "00:00";
-  if (
-    typeof timeVal === "string" &&
-    timeVal.length <= 5 &&
-    timeVal.includes(":")
-  ) {
-    return timeVal;
-  }
-  const d = new Date(timeVal);
-  if (!isNaN(d.getTime())) {
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    return `${hours}:${minutes}`;
-  }
-  return "00:00";
-};
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
-export const transformScheduleToAPI = (data: {
-  start_time_only: string | Date | number;
-  party_day: string;
-  duration_mins: number;
-}) => {
-  const cleanTime = extractTimeString(data.start_time_only);
-  const startString = `${data.party_day}T${cleanTime}:00`;
-  const startDate = new Date(startString);
-  const endDate = new Date(startDate.getTime() + data.duration_mins * 60000);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+export const transformScheduleToAPI = (
+  data: {
+    start_time_only: string | Date | number;
+    party_day: string;
+    duration_mins: number;
+    [key: string]: unknown;
+  },
+  tz: string,
+) => {
+  const rawTime = String(data.start_time_only);
+  const cleanTime =
+    rawTime.length > 5 ? dayjs(rawTime).format("HH:mm") : rawTime;
+
+  const startObj = dayjs.tz(`${data.party_day} ${cleanTime}`, tz);
+
+  const endObj = startObj.add(data.duration_mins, "minute");
 
   return {
     ...data,
-    start_time: startDate.toISOString(),
-    end_time: endDate.toISOString(),
+    start_time: startObj.toISOString(),
+    end_time: endObj.toISOString(),
+
     party_day: undefined,
     start_time_only: undefined,
     duration_mins: undefined,

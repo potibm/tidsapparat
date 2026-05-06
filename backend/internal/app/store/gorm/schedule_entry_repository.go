@@ -2,6 +2,8 @@ package gorm
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/potibm/billedapparat/internal/app/domain"
 	"github.com/potibm/billedapparat/internal/app/repository"
@@ -57,8 +59,20 @@ func (r *scheduleEntryRepository) List(
 		return nil, 0, err
 	}
 
-	err = query.Order(clause.OrderByColumn{Column: clause.Column{Name: params.Sort}, Desc: params.Order == "desc"}).
-		Offset(params.Offset).
+	query = query.Order(clause.OrderByColumn{
+		Column: clause.Column{Name: params.Sort},
+		Desc:   params.Order == "DESC",
+	})
+
+	if params.Sort != "start_time" {
+		query = query.Order("start_time ASC")
+	}
+
+	if params.Sort != "end_time" {
+		query = query.Order("end_time ASC")
+	}
+
+	err = query.Offset(params.Offset).
 		Limit(params.Limit).
 		Find(&dbEntries).
 		Error
@@ -89,7 +103,8 @@ func (r *scheduleEntryRepository) GetByID(ctx context.Context, id int64) (*domai
 
 func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.ScheduleEntryListFilters) *gorm.DB {
 	if f.Query != nil {
-		db = db.Where("title ILIKE ?", "%"+*f.Query+"%")
+		likeQuery := fmt.Sprintf("%%%s%%", *f.Query)
+		db = db.Where("title LIKE ? OR description LIKE ?", likeQuery, likeQuery)
 	}
 
 	if f.Category != nil {
@@ -98,6 +113,11 @@ func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.Schedul
 
 	if f.ID != nil {
 		db = db.Where("id = ?", *f.ID)
+	}
+
+	if f.HidePast {
+		now := time.Now().UTC()
+		db = db.Where("end_time > ?", now)
 	}
 
 	return db

@@ -140,5 +140,10 @@ func parseScheduleEntryFilters(c *gin.Context) repository.ScheduleEntryListFilte
 		}
 	}
 
+	filters.HidePast = false
+	if c.Query("hide_past") == "true" {
+		filters.HidePast = true
+	}
+
 	return filters
 }

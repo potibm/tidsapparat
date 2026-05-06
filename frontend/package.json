@@ -16,6 +16,7 @@
     "@sentry/react": "^10.51.0",
     "@tailwindcss/vite": "^4.2.4",
     "animate.css": "^4.1.1",
+    "dayjs": "^1.11.20",
     "flowbite-react": "^0.12.17",
     "framer-motion": "^12.38.0",
     "ra-data-json-server": "^5.14.6",

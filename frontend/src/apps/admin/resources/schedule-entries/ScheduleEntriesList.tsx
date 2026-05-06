@@ -1,61 +1,143 @@
 import {
   List,
-  Datagrid,
+  DatagridConfigurable,
   TextField,
-  EditButton,
-  DeleteButton,
+  SearchInput,
   FunctionField,
-  DateField,
+  TopToolbar,
+  CreateButton,
+  ExportButton,
+  SelectColumnsButton,
+  BooleanInput,
 } from "react-admin";
+import { Chip } from "@mui/material";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import { ScheduleEntryRecord } from "./schedule_entry.types";
+
+dayjs.extend(isBetween);
+
+const scheduleFilters = [
+  <SearchInput key="q" source="q" alwaysOn placeholder="Search by title..." />,
+
+  <BooleanInput
+    key="hide_past"
+    source="hide_past"
+    label="Hide Past Events"
+    alwaysOn
+  />,
+];
+
+const ListActions = () => (
+  <TopToolbar>
+    <SelectColumnsButton />
+    <CreateButton />
+    <ExportButton />
+  </TopToolbar>
+);
 
 export const ScheduleEntriesList = () => (
-  <List title="Events" sort={{ field: "id", order: "DESC" }}>
-    <Datagrid rowClick="edit" bulkActionButtons={false}>
-      <DateField
-        source="start_time"
-        label="Start"
-        showTime
-        options={{
-          weekday: "short",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
+  <List
+    title="Events"
+    sort={{ field: "id", order: "DESC" }}
+    actions={<ListActions />}
+    filters={scheduleFilters}
+    filterDefaultValues={{ hide_past: true }}
+  >
+    <DatagridConfigurable
+      rowClick="edit"
+      bulkActionButtons={false}
+      omit={["end_time_display", "category", "location"]}
+    >
+      {/* 1. STATUS FIELD */}
+      <FunctionField
+        label="Status"
+        sortable={false}
+        render={(record: ScheduleEntryRecord) => {
+          if (!record.start_time || !record.end_time) return null;
+
+          const now = dayjs();
+          const start = dayjs(record.start_time);
+          const end = dayjs(record.end_time);
+
+          if (now.isBetween(start, end)) {
+            return (
+              <Chip
+                label="Live"
+                color="success"
+                size="small"
+                variant="filled"
+              />
+            );
+          } else if (now.isAfter(end)) {
+            return <Chip label="Done" size="small" variant="outlined" />;
+          } else {
+            return (
+              <Chip
+                label="Upcoming"
+                color="primary"
+                size="small"
+                variant="outlined"
+              />
+            );
+          }
         }}
       />
 
+      {/* 2. TITLE */}
+      <TextField
+        source="title"
+        label="Event Name"
+        sx={{ fontWeight: "bold" }}
+      />
+
+      {/* 3. START TIME */}
+      <FunctionField
+        label="Start"
+        sortBy="start_time"
+        render={(record: ScheduleEntryRecord) => {
+          if (!record.start_time) return "-";
+          return dayjs(record.start_time).format("ddd, HH:mm");
+        }}
+      />
+
+      {/* 3. END TIME (hidden) */}
+      <FunctionField
+        source="end_time_display"
+        label="End"
+        sortBy="end_time"
+        render={(record: ScheduleEntryRecord) =>
+          record.end_time ? dayjs(record.end_time).format("ddd, HH:mm") : "-"
+        }
+      />
+
+      {/* 4. DURATION */}
       <FunctionField
         label="Duration"
         sortBy="end_time"
-        render={(record: {
-          start_time?: string;
-          end_time?: string;
-          title?: string;
-        }) => {
-          if (!record || !record.start_time || !record.end_time) return "-";
+        sortable={false}
+        render={(record: ScheduleEntryRecord) => {
+          if (!record.start_time || !record.end_time) return "-";
+          const start = dayjs(record.start_time);
+          const end = dayjs(record.end_time);
+          const diffMins = end.diff(start, "minute");
+          const endTimeString = end.format("ddd, HH:mm");
 
-          const start = new Date(record.start_time);
-          const end = new Date(record.end_time);
-
-          const diffMins = Math.round(
-            (end.getTime() - start.getTime()) / 60000,
+          return (
+            <span
+              title={`Ends at: ${endTimeString}`}
+              style={{ cursor: "help", borderBottom: "1px dotted #888" }}
+            >
+              {diffMins}m
+            </span>
           );
-
-          const endTimeString = end.toLocaleString("en-US", {
-            weekday: "short",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-
-          return <span title={`Ends at: ${endTimeString}`}>{diffMins}m</span>;
         }}
       />
 
-      <TextField source="title" label="Title" />
-
-      <EditButton />
-      <DeleteButton />
-    </Datagrid>
+      {/* 5. LOCATION / CATEGORY */}
+      <TextField source="location" label="Location" />
+      <TextField source="category" label="Category" />
+    </DatagridConfigurable>
   </List>
 );
 

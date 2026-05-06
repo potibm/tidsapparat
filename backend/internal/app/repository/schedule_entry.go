@@ -10,6 +10,7 @@ type ScheduleEntryListFilters struct {
 	Query    *string
 	Category *string
 	ID       *int64
+	HidePast bool
 }
 
 type ScheduleEntryListParams struct {

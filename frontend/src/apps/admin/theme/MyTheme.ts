@@ -5,24 +5,31 @@ export const MyTheme: ThemeOptions = {
   ...defaultTheme,
   palette: {
     ...defaultTheme.palette,
+    mode: "light",
     primary: {
-      main: "#00838F",
+      main: "#3B82F6",
     },
     secondary: {
       main: "#BF00FF",
-      contrastText: "#111827",
+      contrastText: "#FFFFFF",
     },
-    error: {
-      main: "#FF3366",
+    background: {
+      default: "#F8FAFC",
+      paper: "#FFFFFF",
     },
+    error: { main: "#FF3366" },
+    warning: { main: "#FF9800" },
+    info: { main: "#00BCD4" },
+    success: { main: "#10B981" },
   },
   components: {
     ...defaultTheme.components,
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: "4px",
+          borderRadius: "6px",
           fontWeight: 600,
+          textTransform: "none",
         },
       },
     },
@@ -32,29 +39,41 @@ export const MyTheme: ThemeOptions = {
 export const MyDarkTheme: ThemeOptions = {
   ...defaultTheme,
   palette: {
+    ...defaultTheme.palette,
     mode: "dark",
     primary: {
       main: "#BF00FF",
+      contrastText: "#FFFFFF",
     },
     secondary: {
-      main: "#111827",
-      contrastText: "#BF00FF",
-    },
-    error: {
-      main: "#FF3366",
+      main: "#00E5FF",
+      contrastText: "#000000",
     },
     background: {
-      default: "#0f172a",
-      paper: "#1e293b",
+      default: "#0F172A",
+      paper: "#1E293B",
     },
+    error: { main: "#FF3366" },
+    warning: { main: "#FFB300" },
+    info: { main: "#00E5FF" },
+    success: { main: "#00E676" },
   },
   components: {
     ...defaultTheme.components,
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: "4px",
+          borderRadius: "6px",
           fontWeight: 600,
+          textTransform: "none",
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          backgroundColor: "#0F172A",
+          fontWeight: 700,
         },
       },
     },
