@@ -9,6 +9,10 @@ import {
   ExportButton,
   SelectColumnsButton,
   BooleanInput,
+  ReferenceField,
+  ChipField,
+  ReferenceInput,
+  SelectInput,
 } from "react-admin";
 import { Chip } from "@mui/material";
 import dayjs from "dayjs";
@@ -19,6 +23,15 @@ dayjs.extend(isBetween);
 
 const scheduleFilters = [
   <SearchInput key="q" source="q" alwaysOn placeholder="Search by title..." />,
+
+  <ReferenceInput
+    key="category_id"
+    source="category_id"
+    reference="categories"
+    alwaysOn
+  >
+    <SelectInput label="Category" optionText="name" />
+  </ReferenceInput>,
 
   <BooleanInput
     key="hide_past"
@@ -47,7 +60,7 @@ export const ScheduleEntriesList = () => (
     <DatagridConfigurable
       rowClick="edit"
       bulkActionButtons={false}
-      omit={["end_time_display", "category", "location"]}
+      omit={["end_time_display", "category_id", "location"]}
     >
       {/* 1. STATUS FIELD */}
       <FunctionField
@@ -136,7 +149,13 @@ export const ScheduleEntriesList = () => (
 
       {/* 5. LOCATION / CATEGORY */}
       <TextField source="location" label="Location" />
-      <TextField source="category" label="Category" />
+      <ReferenceField
+        source="category_id"
+        reference="categories"
+        label="Category"
+      >
+        <ChipField source="name" />
+      </ReferenceField>
     </DatagridConfigurable>
   </List>
 );

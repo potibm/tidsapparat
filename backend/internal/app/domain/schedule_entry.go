@@ -11,5 +11,6 @@ type ScheduleEntry struct {
 	StartTime   time.Time `json:"start_time"`
 	EndTime     time.Time `json:"end_time"`
 	Location    string    `json:"location"`
-	Category    string    `json:"category"`
+	CategoryID  *int64    `json:"category_id,omitempty"`
+	Category    *Category `json:"category,omitempty"`
 }

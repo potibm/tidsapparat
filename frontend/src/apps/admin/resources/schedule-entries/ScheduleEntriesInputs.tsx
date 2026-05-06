@@ -1,6 +1,6 @@
 import { TimeSelector } from "@admin/components/fields/TimeSelector";
 import { useAppConfig } from "@core/config/useConfig";
-import { TextInput } from "react-admin";
+import { TextInput, ReferenceInput, SelectInput } from "react-admin";
 
 export const ScheduleEntriesInputs = () => {
   const { party_days: partyDays, event_durations: eventDurations } =
@@ -16,7 +16,9 @@ export const ScheduleEntriesInputs = () => {
 
       <TextInput source="location" />
 
-      <TextInput source="category" />
+      <ReferenceInput source="category_id" reference="categories">
+        <SelectInput label="Category" optionText="name" />
+      </ReferenceInput>
     </>
   );
 };
