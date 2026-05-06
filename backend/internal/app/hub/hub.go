@@ -25,12 +25,15 @@ const (
 	defaultReadHeaderTimeout  = 3 * time.Second
 	pathScheduleEntries       = "/schedule-entries"
 	pathScheduleEntriesWithID = "/schedule-entries/:id"
+	pathCategories            = "/categories"
+	pathCategoriesWithID      = "/categories/:id"
 )
 
 type Config struct {
 	Port              int
 	StaticFiles       embed.FS
 	ScheduleEntryRepo repository.ScheduleEntryRepository
+	CategoryRepo      repository.CategoryRepository
 	Cfg               config.Config
 }
 
@@ -38,6 +41,7 @@ type Server struct {
 	port              int
 	staticFiles       embed.FS
 	scheduleEntryRepo repository.ScheduleEntryRepository
+	categoryRepo      repository.CategoryRepository
 	cfg               config.Config
 	logger            *slog.Logger
 }
@@ -49,6 +53,7 @@ func NewServer(cfg Config) (*Server, error) {
 		port:              cfg.Port,
 		staticFiles:       cfg.StaticFiles,
 		scheduleEntryRepo: cfg.ScheduleEntryRepo,
+		categoryRepo:      cfg.CategoryRepo,
 		cfg:               cfg.Cfg,
 		logger:            logger.With("component", "HubServer"),
 	}, nil
@@ -117,6 +122,12 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 	admin.GET(pathScheduleEntriesWithID, s.getScheduleEntry)
 	admin.PUT(pathScheduleEntriesWithID, s.updateScheduleEntry)
 	admin.DELETE(pathScheduleEntriesWithID, s.deleteScheduleEntry)
+
+	admin.GET(pathCategories, s.listCategories)
+	admin.POST(pathCategories, s.createCategory)
+	admin.GET(pathCategoriesWithID, s.getCategory)
+	admin.PUT(pathCategoriesWithID, s.updateCategory)
+	admin.DELETE(pathCategoriesWithID, s.deleteCategory)
 
 	r.NoRoute(func(c *gin.Context) {
 		if !strings.HasPrefix(c.Request.RequestURI, "/api") && !strings.Contains(c.Request.RequestURI, ".") {

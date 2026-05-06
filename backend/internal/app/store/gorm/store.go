@@ -16,6 +16,7 @@ type Store struct {
 
 var allModels = []interface{}{
 	&dbScheduleEntry{},
+	&dbCategory{},
 }
 
 func NewSqliteStore(filename string) (*Store, error) {

@@ -130,8 +130,10 @@ func parseScheduleEntryFilters(c *gin.Context) repository.ScheduleEntryListFilte
 		filters.Query = &q
 	}
 
-	if cat := c.Query("category"); cat != "" {
-		filters.Category = &cat
+	if catIDStr := c.Query("category_id"); catIDStr != "" {
+		if catID, err := strconv.ParseInt(catIDStr, 10, 64); err == nil {
+			filters.CategoryID = &catID
+		}
 	}
 
 	if idStr := c.Query("id"); idStr != "" {

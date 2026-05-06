@@ -3,6 +3,7 @@ import { MyTheme, MyDarkTheme } from "./theme/MyTheme";
 import { MyLayout } from "./theme/MyLayout";
 import { dataProvider } from "./providers/dataProvider";
 import scheduleEntries from "./resources/schedule-entries";
+import categories from "./resources/categories";
 
 export const AdminApp = () => (
   <Admin
@@ -13,5 +14,6 @@ export const AdminApp = () => (
     title="Tidsapparat Admin"
   >
     <Resource {...scheduleEntries} />
+    <Resource {...categories} />
   </Admin>
 );

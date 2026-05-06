@@ -14,7 +14,8 @@ type dbScheduleEntry struct {
 	StartTime   time.Time
 	EndTime     time.Time
 	Location    string
-	Category    string
+	CategoryID  *int64
+	Category    *dbCategory `gorm:"foreignKey:CategoryID"`
 }
 
 func (dbScheduleEntry) TableName() string {
@@ -30,11 +31,16 @@ func fromDomainScheduleEntry(s *domain.ScheduleEntry) *dbScheduleEntry {
 		StartTime:   s.StartTime,
 		EndTime:     s.EndTime,
 		Location:    s.Location,
-		Category:    s.Category,
+		CategoryID:  s.CategoryID,
 	}
 }
 
 func toDomainScheduleEntry(db *dbScheduleEntry) *domain.ScheduleEntry {
+	var category *domain.Category
+	if db.Category != nil {
+		category = toDomainCategory(db.Category)
+	}
+
 	return &domain.ScheduleEntry{
 		ID:          db.ID,
 		Title:       db.Title,
@@ -42,6 +48,7 @@ func toDomainScheduleEntry(db *dbScheduleEntry) *domain.ScheduleEntry {
 		StartTime:   db.StartTime,
 		EndTime:     db.EndTime,
 		Location:    db.Location,
-		Category:    db.Category,
+		CategoryID:  db.CategoryID,
+		Category:    category,
 	}
 }

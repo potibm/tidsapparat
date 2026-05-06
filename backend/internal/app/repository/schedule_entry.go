@@ -7,10 +7,10 @@ import (
 )
 
 type ScheduleEntryListFilters struct {
-	Query    *string
-	Category *string
-	ID       *int64
-	HidePast bool
+	Query      *string
+	CategoryID *int64
+	ID         *int64
+	HidePast   bool
 }
 
 type ScheduleEntryListParams struct {
