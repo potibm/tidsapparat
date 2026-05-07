@@ -78,7 +78,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
 
   if (error) {
     return (
-      <div className="text-red-50">
+      <div>
         <h2>System Configuration Error</h2>
         <pre>{error}</pre>
       </div>
