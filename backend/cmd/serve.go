@@ -4,11 +4,14 @@ import (
 	"embed"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/potibm/billedapparat/internal/app/exporter"
 	"github.com/potibm/billedapparat/internal/app/hub"
 	"github.com/potibm/billedapparat/internal/app/initializer"
+	"github.com/potibm/billedapparat/internal/app/services"
 	store "github.com/potibm/billedapparat/internal/app/store/gorm"
 )
 
@@ -56,6 +59,22 @@ func NewServeCmd() *cobra.Command {
 				}
 			}()
 
+			redisClient := initializer.InitializeRedis(Cfg.App.RedisURL)
+
+			scheduleRepo := dbStore.NewScheduleEntryRepository()
+
+			slog.Info("Performing initial boot export...")
+
+			exportMgr := exporter.NewManager(scheduleRepo, 10*time.Second)
+			exportMgr.Register(exporter.NewLogExporter())
+
+			go exportMgr.RunAll()
+
+			slog.Info("Performing initial boot sync...")
+
+			eventHub := services.NewEventHub(exportMgr, redisClient, scheduleRepo)
+			eventHub.PublishFullSync(ctx)
+
 			// 4. Initialize external services (Sentry)
 			initializer.InitializeSentry(Cfg.Sentry)
 
@@ -63,9 +82,11 @@ func NewServeCmd() *cobra.Command {
 			server, err := hub.NewServer(hub.Config{
 				Port:              port,
 				StaticFiles:       staticFiles,
-				ScheduleEntryRepo: dbStore.NewScheduleEntryRepository(),
+				ScheduleEntryRepo: scheduleRepo,
 				CategoryRepo:      dbStore.NewCategoryRepository(),
 				LocationRepo:      dbStore.NewLocationRepository(),
+				EventHub:          eventHub,
+				ExporterManager:   exportMgr,
 				Cfg:               Cfg,
 			})
 			if err != nil {

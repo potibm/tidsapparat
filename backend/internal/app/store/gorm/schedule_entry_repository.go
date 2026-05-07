@@ -126,3 +126,74 @@ func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.Schedul
 
 	return db
 }
+
+func (r *scheduleEntryRepository) GetAllPreloaded(ctx context.Context) (domain.TimeTable, error) {
+	var dbEntries []dbScheduleEntry
+
+	err := r.db.WithContext(ctx).
+		Preload("Category").
+		Preload("Location").
+		Order("start_time ASC").
+		Order("end_time ASC").
+		Find(&dbEntries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch timetable: %w", err)
+	}
+
+	var result domain.TimeTable
+	for _, dbE := range dbEntries {
+		result = append(result, toDomainScheduleEntry(&dbE))
+	}
+
+	return result, nil
+}
+
+func (r *scheduleEntryRepository) GetByCategoryID(
+	ctx context.Context,
+	categoryID int64,
+) ([]domain.ScheduleEntry, error) {
+	var dbEntries []dbScheduleEntry
+
+	err := r.db.WithContext(ctx).
+		Where("category_id = ?", categoryID).
+		Preload("Category").
+		Preload("Location").
+		Order("start_time ASC").
+		Order("end_time ASC").
+		Find(&dbEntries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch schedule entries by category ID: %w", err)
+	}
+
+	var result []domain.ScheduleEntry
+	for _, dbE := range dbEntries {
+		result = append(result, *toDomainScheduleEntry(&dbE))
+	}
+
+	return result, nil
+}
+
+func (r *scheduleEntryRepository) GetByLocationID(
+	ctx context.Context,
+	locationID int64,
+) ([]domain.ScheduleEntry, error) {
+	var dbEntries []dbScheduleEntry
+
+	err := r.db.WithContext(ctx).
+		Where("location_id = ?", locationID).
+		Preload("Category").
+		Preload("Location").
+		Order("start_time ASC").
+		Order("end_time ASC").
+		Find(&dbEntries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch schedule entries by location ID: %w", err)
+	}
+
+	var result []domain.ScheduleEntry
+	for _, dbE := range dbEntries {
+		result = append(result, *toDomainScheduleEntry(&dbE))
+	}
+
+	return result, nil
+}

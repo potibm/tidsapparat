@@ -59,3 +59,12 @@ func toDomainScheduleEntry(db *dbScheduleEntry) *domain.ScheduleEntry {
 		Location:    location,
 	}
 }
+
+func toDomainScheduleEntries(db *[]dbScheduleEntry) domain.TimeTable {
+	entries := make(domain.TimeTable, len(*db))
+	for i, dbEntry := range *db {
+		entries[i] = toDomainScheduleEntry(&dbEntry)
+	}
+
+	return entries
+}

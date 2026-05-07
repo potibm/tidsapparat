@@ -1,6 +1,8 @@
 //nolint:lll // struct tags can get long and it's more readable to keep them in one line
 package config
 
+type RedisURL string
+
 type SentryConfig struct {
 	DSN                     string  `json:"dsn"                        mapstructure:"dsn"                        validate:"omitempty,url"`
 	TraceSampleRate         float64 `json:"trace_sample_rate"          mapstructure:"trace_sample_rate"          validate:"omitempty,gte=0,lte=1"`
@@ -23,6 +25,7 @@ type AppConfig struct {
 	FrontendURL        string                 `mapstructure:"frontend_url"        validate:"required,http_url"`
 	CorsAllowOrigins   CorsAllowOriginsConfig `mapstructure:"cors_allow_origins"  validate:"dive,required"`
 	EnvironmentMessage string                 `mapstructure:"environment_message"`
+	RedisURL           RedisURL               `mapstructure:"redis_url"           validate:"omitempty,url"`
 }
 
 type CorsAllowOriginsConfig []string

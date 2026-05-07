@@ -15,3 +15,5 @@ type ScheduleEntry struct {
 	LocationID  *int64    `json:"location_id,omitempty"`
 	Location    *Location `json:"location,omitempty"`
 }
+
+type TimeTable []*ScheduleEntry
