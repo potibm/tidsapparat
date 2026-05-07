@@ -57,6 +57,8 @@ func toDomainScheduleEntry(db *dbScheduleEntry) *domain.ScheduleEntry {
 		Category:    category,
 		LocationID:  db.LocationID,
 		Location:    location,
+		CreatedAt:   db.CreatedAt,
+		UpdatedAt:   db.UpdatedAt,
 	}
 }
 

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"log/slog"
@@ -11,6 +12,7 @@ import (
 	"github.com/potibm/billedapparat/internal/app/exporter"
 	"github.com/potibm/billedapparat/internal/app/hub"
 	"github.com/potibm/billedapparat/internal/app/initializer"
+	"github.com/potibm/billedapparat/internal/app/repository"
 	"github.com/potibm/billedapparat/internal/app/services"
 	store "github.com/potibm/billedapparat/internal/app/store/gorm"
 )
@@ -19,7 +21,8 @@ import (
 var staticFiles embed.FS
 
 const (
-	defaultPort = 3200
+	defaultPort             = 3200
+	defaultDebounceDuration = 10 * time.Second
 )
 
 var (
@@ -35,10 +38,12 @@ func NewServeCmd() *cobra.Command {
 			return ensureAppInfrastructure()
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// 1. Context
 			ctx := cmd.Context()
+			logger := slog.Default()
 
-			// 2. Initialize Telemetry
+			// =========================================================================
+			// PHASE 1: Observability & Telemetry
+			// =========================================================================
 			shutdownFn, err := initializer.InitTelemetry(ctx, otelEndpoint, Cfg.App.Version)
 			if err != nil {
 				return fmt.Errorf("failed to initialize telemetry: %w", err)
@@ -48,6 +53,11 @@ func NewServeCmd() *cobra.Command {
 				defer shutdownFn()
 			}
 
+			initializer.InitializeSentry(Cfg.Sentry)
+
+			// =========================================================================
+			// PHASE 2: Core Infrastructure (DB & Redis)
+			// =========================================================================
 			dbStore, err := store.NewSqliteStore(Cfg.App.DbFilename)
 			if err != nil {
 				return fmt.Errorf("database error: %w", err)
@@ -55,18 +65,25 @@ func NewServeCmd() *cobra.Command {
 
 			defer func() {
 				if err := dbStore.Close(); err != nil {
-					slog.Error("failed to close database", "error", err)
+					logger.Error("failed to close database", "error", err)
 				}
 			}()
 
-			redisClient := initializer.InitializeRedis(Cfg.App.RedisURL)
-
 			scheduleRepo := dbStore.NewScheduleEntryRepository()
 
-			slog.Info("Performing initial boot export...")
+			redisClient := initializer.InitializeRedis(Cfg.App.RedisURL)
 
-			exportMgr := exporter.NewManager(scheduleRepo, 10*time.Second)
-			exportMgr.Register(exporter.NewLogExporter())
+			// =========================================================================
+			// PHASE 3: Background Tasks (Exporters & Hub)
+			// =========================================================================
+
+			exportMgr, err := setupExportManager(ctx, scheduleRepo, logger)
+			if err != nil {
+				return err
+			}
+
+			// Trigger initial export and sync
+			slog.Info("Performing initial boot export...")
 
 			go exportMgr.RunAll()
 
@@ -75,10 +92,10 @@ func NewServeCmd() *cobra.Command {
 			eventHub := services.NewEventHub(exportMgr, redisClient, scheduleRepo)
 			eventHub.PublishFullSync(ctx)
 
-			// 4. Initialize external services (Sentry)
-			initializer.InitializeSentry(Cfg.Sentry)
+			// =========================================================================
+			// PHASE 4: API Server
+			// =========================================================================
 
-			// 5. Start the server
 			server, err := hub.NewServer(hub.Config{
 				Port:              port,
 				StaticFiles:       staticFiles,
@@ -101,4 +118,41 @@ func NewServeCmd() *cobra.Command {
 		StringVar(&otelEndpoint, "otel-endpoint", "", "Set the OpenTelemetry endpoint (e.g., localhost:4317)")
 
 	return cmd
+}
+
+func setupExportManager(
+	ctx context.Context,
+	repo repository.ScheduleEntryRepository,
+	logger *slog.Logger,
+) (*exporter.Manager, error) {
+	exportMgr := exporter.NewManager(repo, defaultDebounceDuration)
+
+	// Always register default log exporter for debugging purposes
+	exportMgr.Register(exporter.NewLogExporter())
+
+	// Initialize s3 client if configured
+	s3Client, err := initializer.InitializeS3Client(ctx, Cfg.S3Client, logger)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize S3 client: %w", err)
+	}
+
+	// Create exporters based on config
+	exporters, err := initializer.BootstrapExporters(
+		ctx,
+		Cfg.App.Version,
+		Cfg.Party,
+		Cfg.Exporter,
+		s3Client,
+		logger,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to bootstrap exporters: %w", err)
+	}
+
+	// Register exporters with the manager
+	for _, exp := range exporters {
+		exportMgr.Register(exp)
+	}
+
+	return exportMgr, nil
 }

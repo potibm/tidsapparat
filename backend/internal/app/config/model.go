@@ -28,9 +28,35 @@ type AppConfig struct {
 	RedisURL           RedisURL               `mapstructure:"redis_url"           validate:"omitempty,url"`
 }
 
+type ExporterConfig struct {
+	Name        string            `mapstructure:"name"`
+	Type        string            `mapstructure:"type"`
+	Destination string            `mapstructure:"destination"`
+	Filename    string            `mapstructure:"filename"`
+	Options     map[string]string `mapstructure:"options"`
+}
+
 type CorsAllowOriginsConfig []string
 
+type PartyConfig struct {
+	Timezone       string `mapstructure:"timezone"        validate:"required"`
+	DefaultAddress string `mapstructure:"default_address"`
+	StartDate      string `mapstructure:"start_date"      validate:"required,datetime=2006-01-02"`
+	EndDate        string `mapstructure:"end_date"        validate:"required,datetime=2006-01-02"`
+}
+
+type S3ClientConfig struct {
+	AccessKeyID     string `mapstructure:"access_key_id"     validate:"required"`
+	SecretAccessKey string `mapstructure:"secret_access_key" validate:"required"`
+	Region          string `mapstructure:"region"            validate:"required"`
+	Endpoint        string `mapstructure:"endpoint"          validate:"required"`
+	UsePathStyle    bool   `mapstructure:"use_path_style"`
+}
+
 type Config struct {
-	App    AppConfig    `mapstructure:"app"`
-	Sentry SentryConfig `mapstructure:"sentry"`
+	App      AppConfig        `mapstructure:"app"`
+	Sentry   SentryConfig     `mapstructure:"sentry"`
+	Exporter []ExporterConfig `mapstructure:"exporter"`
+	Party    PartyConfig      `mapstructure:"party"`
+	S3Client *S3ClientConfig  `mapstructure:"s3_client"`
 }

@@ -101,32 +101,6 @@ func (r *scheduleEntryRepository) GetByID(ctx context.Context, id int64) (*domai
 	return entry, nil
 }
 
-func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.ScheduleEntryListFilters) *gorm.DB {
-	if f.Query != nil {
-		likeQuery := fmt.Sprintf("%%%s%%", *f.Query)
-		db = db.Where("title LIKE ? OR description LIKE ?", likeQuery, likeQuery)
-	}
-
-	if f.CategoryID != nil {
-		db = db.Where("category_id = ?", *f.CategoryID)
-	}
-
-	if f.LocationID != nil {
-		db = db.Where("location_id = ?", *f.LocationID)
-	}
-
-	if f.ID != nil {
-		db = db.Where("id = ?", *f.ID)
-	}
-
-	if f.HidePast {
-		now := time.Now().UTC()
-		db = db.Where("end_time > ?", now)
-	}
-
-	return db
-}
-
 func (r *scheduleEntryRepository) GetAllPreloaded(ctx context.Context) (domain.TimeTable, error) {
 	var dbEntries []dbScheduleEntry
 
@@ -196,4 +170,30 @@ func (r *scheduleEntryRepository) GetByLocationID(
 	}
 
 	return result, nil
+}
+
+func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.ScheduleEntryListFilters) *gorm.DB {
+	if f.Query != nil {
+		likeQuery := fmt.Sprintf("%%%s%%", *f.Query)
+		db = db.Where("title LIKE ? OR description LIKE ?", likeQuery, likeQuery)
+	}
+
+	if f.CategoryID != nil {
+		db = db.Where("category_id = ?", *f.CategoryID)
+	}
+
+	if f.LocationID != nil {
+		db = db.Where("location_id = ?", *f.LocationID)
+	}
+
+	if f.ID != nil {
+		db = db.Where("id = ?", *f.ID)
+	}
+
+	if f.HidePast {
+		now := time.Now().UTC()
+		db = db.Where("end_time > ?", now)
+	}
+
+	return db
 }

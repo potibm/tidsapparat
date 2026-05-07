@@ -15,6 +15,7 @@ type ScheduleSource interface {
 	GetByCategoryID(ctx context.Context, categoryID int64) ([]domain.ScheduleEntry, error)
 	GetByLocationID(ctx context.Context, locationID int64) ([]domain.ScheduleEntry, error)
 	GetAllPreloaded(ctx context.Context) (domain.TimeTable, error)
+	GetByID(ctx context.Context, id int64) (*domain.ScheduleEntry, error)
 }
 
 type EventHub struct {
@@ -24,20 +25,37 @@ type EventHub struct {
 	logger   *slog.Logger
 }
 
-func NewEventHub(exporter *exporter.Manager, redisClient *redis.Client, repo ScheduleSource) *EventHub {
+func NewEventHub(e *exporter.Manager, redisClient *redis.Client, repo ScheduleSource) *EventHub {
 	logger := slog.Default().With("component", "EventHub")
 
 	return &EventHub{
-		exporter: exporter,
+		exporter: e,
 		redis:    redisClient,
 		repo:     repo,
 		logger:   logger,
 	}
 }
 
-func (h *EventHub) Publish(ctx context.Context, entry *domain.ScheduleEntry, action ActionType) {
+func (h *EventHub) Publish(ctx context.Context, entryID int64, action ActionType) {
 	if h.redis != nil {
-		eventDTO := mapToEventDTO(entry, action)
+		var eventDTO ScheduleEventDTO
+
+		if action == ActionDelete {
+			eventDTO = ScheduleEventDTO{
+				Action:    action,
+				Timestamp: time.Now().Unix(),
+				Payload:   ScheduleEntryDTO{ID: entryID},
+			}
+		} else {
+			entry, err := h.repo.GetByID(ctx, entryID)
+			if err != nil {
+				h.logger.Error("Failed to fetch schedule entry", "id", entryID, "error", err)
+
+				return
+			}
+
+			eventDTO = mapToEventDTO(entry, action)
+		}
 
 		h.sendToStream(ctx, eventDTO)
 	}
@@ -72,7 +90,7 @@ func (h *EventHub) SyncCategoryUpdate(ctx context.Context, catID int64) {
 	entries, _ := h.repo.GetByCategoryID(ctx, catID)
 
 	for _, entry := range entries {
-		h.Publish(ctx, &entry, "updated")
+		h.Publish(ctx, entry.ID, "updated")
 	}
 
 	h.exporter.Ping()
@@ -82,7 +100,7 @@ func (h *EventHub) SyncLocationUpdate(ctx context.Context, locationID int64) {
 	entries, _ := h.repo.GetByLocationID(ctx, locationID)
 
 	for _, entry := range entries {
-		h.Publish(ctx, &entry, "updated")
+		h.Publish(ctx, entry.ID, "updated")
 	}
 
 	h.exporter.Ping()

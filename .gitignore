@@ -12,5 +12,6 @@ backend/config.local.yaml
 backend/config/*
 backend/coverage.*
 backend/_config.*
+backend/exports/*
 backend/tmp
 *.log

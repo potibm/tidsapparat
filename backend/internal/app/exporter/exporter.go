@@ -9,6 +9,8 @@ import (
 	"github.com/potibm/billedapparat/internal/app/domain"
 )
 
+const defaultTimeout = 30 * time.Second
+
 type Exporter interface {
 	Name() string
 	Export(ctx context.Context, timetable domain.TimeTable) error
@@ -59,7 +61,7 @@ func (m *Manager) Ping() {
 }
 
 func (m *Manager) RunAll() {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
 	timetable, err := m.db.GetAllPreloaded(ctx)
