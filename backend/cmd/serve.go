@@ -86,7 +86,6 @@ func NewServeCmd() *cobra.Command {
 				CategoryRepo:      dbStore.NewCategoryRepository(),
 				LocationRepo:      dbStore.NewLocationRepository(),
 				EventHub:          eventHub,
-				ExporterManager:   exportMgr,
 				Cfg:               Cfg,
 			})
 			if err != nil {
