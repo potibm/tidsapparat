@@ -40,6 +40,7 @@ func TestIcalFormatter_Format(t *testing.T) {
 			ID:          1,
 			Title:       "Opening Ceremony",
 			Description: "The grand opening",
+			ExternalURL: "https://example.com/event",
 			StartTime:   now,
 			EndTime:     now.Add(2 * time.Hour),
 			CreatedAt:   now,
@@ -73,6 +74,7 @@ func TestIcalFormatter_Format(t *testing.T) {
 	assert.Contains(t, output, `LOCATION:Main Hall\, 123 Main St`)
 	assert.Contains(t, output, "CATEGORIES:Ceremony")
 	assert.Contains(t, output, "STATUS:CONFIRMED")
+	assert.Contains(t, output, "URL:https://example.com/event")
 }
 
 func TestIcalFormatter_Format_MultipleEntries(t *testing.T) {
@@ -128,6 +130,7 @@ func TestIcalFormatter_Format_NoLocation(t *testing.T) {
 	output := string(result)
 	assert.NotContains(t, output, "LOCATION:")
 	assert.NotContains(t, output, "CATEGORIES:")
+	assert.NotContains(t, output, "URL:")
 }
 
 func TestIcalFormatter_Format_LocationWithDefaultAddress(t *testing.T) {

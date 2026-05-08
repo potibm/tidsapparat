@@ -8,6 +8,7 @@ type ScheduleEntry struct {
 	ID          int64     `json:"id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
+	ExternalURL string    `json:"external_url"`
 	StartTime   time.Time `json:"start_time"`
 	EndTime     time.Time `json:"end_time"`
 	CategoryID  *int64    `json:"category_id,omitempty"`

@@ -23,6 +23,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				ID:          1,
 				Title:       "Opening Ceremony",
 				Description: "The grand opening",
+				ExternalURL: "https://example.com/opening",
 				StartTime:   now,
 				EndTime:     now.Add(2 * time.Hour),
 				Category: &domain.Category{
@@ -40,6 +41,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				ID:          1,
 				Title:       "Opening Ceremony",
 				Description: "The grand opening",
+				ExternalURL: "https://example.com/opening",
 				StartTime:   "2024-06-15T10:30:00Z",
 				EndTime:     "2024-06-15T12:30:00Z",
 				Category: &CategoryDTO{
@@ -58,6 +60,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				ID:          2,
 				Title:       "Lunch Break",
 				Description: "Free time",
+				ExternalURL: "",
 				StartTime:   now,
 				EndTime:     now.Add(1 * time.Hour),
 			},
@@ -65,6 +68,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				ID:          2,
 				Title:       "Lunch Break",
 				Description: "Free time",
+				ExternalURL: "",
 				StartTime:   "2024-06-15T10:30:00Z",
 				EndTime:     "2024-06-15T11:30:00Z",
 				Category:    nil,

@@ -31,6 +31,7 @@ type ScheduleEntryDTO struct {
 	ID          int64        `json:"id"`
 	Title       string       `json:"title"`
 	Description string       `json:"description"`
+	ExternalURL string       `json:"external_url"`
 	StartTime   string       `json:"start_time"` // RFC3339
 	EndTime     string       `json:"end_time"`   // RFC3339
 	Category    *CategoryDTO `json:"category,omitempty"`
@@ -52,6 +53,7 @@ func mapToEntryDTO(entry *domain.ScheduleEntry) ScheduleEntryDTO {
 		ID:          entry.ID,
 		Title:       entry.Title,
 		Description: entry.Description,
+		ExternalURL: entry.ExternalURL,
 		StartTime:   entry.StartTime.Format(time.RFC3339),
 		EndTime:     entry.EndTime.Format(time.RFC3339),
 	}

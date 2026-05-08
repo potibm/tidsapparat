@@ -48,6 +48,10 @@ func (f *IcalFormatter) Format(entries domain.TimeTable) ([]byte, error) {
 		event.SetSummary(entry.Title)
 		event.SetDescription(entry.Description)
 
+		if entry.ExternalURL != "" {
+			event.SetURL(entry.ExternalURL)
+		}
+
 		if entry.Location != nil {
 			locString := entry.Location.Name
 
