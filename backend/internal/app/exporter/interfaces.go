@@ -8,7 +8,7 @@ import (
 
 type Formatter interface {
 	Format(entries domain.TimeTable) ([]byte, error)
-	Extension() string // z.B. ".ics" oder ".json"
+	Extension() string // e.g. ".ics" or ".json"
 }
 
 type Writer interface {

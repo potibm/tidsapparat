@@ -18,7 +18,7 @@ type Exporter interface {
 
 type Manager struct {
 	exporters    []Exporter
-	db           ScheduleSource // Interface um die Daten frisch aus der DB zu holen
+	db           ScheduleSource // Interface to fetch fresh data from the database
 	debounceTime time.Duration
 	timer        *time.Timer
 	mu           sync.Mutex
