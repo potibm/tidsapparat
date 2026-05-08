@@ -18,18 +18,18 @@ type Exporter interface {
 
 type Manager struct {
 	exporters    []Exporter
-	db           ScheduleSource // Interface to fetch fresh data from the database
+	db           AllPreloader // Interface to fetch fresh data from the database
 	debounceTime time.Duration
 	timer        *time.Timer
 	mu           sync.Mutex
 	logger       *slog.Logger
 }
 
-type ScheduleSource interface {
+type AllPreloader interface {
 	GetAllPreloaded(ctx context.Context) (domain.TimeTable, error)
 }
 
-func NewManager(source ScheduleSource, debounce time.Duration) *Manager {
+func NewManager(source AllPreloader, debounce time.Duration) *Manager {
 	logger := slog.Default()
 
 	return &Manager{

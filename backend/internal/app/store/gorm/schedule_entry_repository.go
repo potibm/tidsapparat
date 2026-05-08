@@ -11,6 +11,11 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const (
+	orderStartTimeASC = "start_time ASC"
+	orderEndTimeASC   = "end_time ASC"
+)
+
 type scheduleEntryRepository struct {
 	db *gorm.DB
 }
@@ -65,11 +70,11 @@ func (r *scheduleEntryRepository) List(
 	})
 
 	if params.Sort != "start_time" {
-		query = query.Order("start_time ASC")
+		query = query.Order(orderStartTimeASC)
 	}
 
 	if params.Sort != "end_time" {
-		query = query.Order("end_time ASC")
+		query = query.Order(orderEndTimeASC)
 	}
 
 	err = query.Offset(params.Offset).
@@ -107,8 +112,8 @@ func (r *scheduleEntryRepository) GetAllPreloaded(ctx context.Context) (domain.T
 	err := r.db.WithContext(ctx).
 		Preload("Category").
 		Preload("Location").
-		Order("start_time ASC").
-		Order("end_time ASC").
+		Order(orderStartTimeASC).
+		Order(orderEndTimeASC).
 		Find(&dbEntries).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch timetable: %w", err)
@@ -132,8 +137,8 @@ func (r *scheduleEntryRepository) GetByCategoryID(
 		Where("category_id = ?", categoryID).
 		Preload("Category").
 		Preload("Location").
-		Order("start_time ASC").
-		Order("end_time ASC").
+		Order(orderStartTimeASC).
+		Order(orderEndTimeASC).
 		Find(&dbEntries).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch schedule entries by category ID: %w", err)
@@ -157,8 +162,8 @@ func (r *scheduleEntryRepository) GetByLocationID(
 		Where("location_id = ?", locationID).
 		Preload("Category").
 		Preload("Location").
-		Order("start_time ASC").
-		Order("end_time ASC").
+		Order(orderStartTimeASC).
+		Order(orderEndTimeASC).
 		Find(&dbEntries).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch schedule entries by location ID: %w", err)
