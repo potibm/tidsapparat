@@ -31,6 +31,7 @@ func InitViper() {
 	viper.SetDefault("app.db_filename", DefaultDBFilename)
 	viper.SetDefault("app.frontend_url", "")
 	viper.SetDefault("app.cors_allow_origins", []string{})
+	viper.SetDefault("app.redis_url", "")
 
 	viper.SetDefault("sentry.dsn", "")
 	viper.SetDefault("sentry.trace_sample_rate", DefaultTraceSampleRate)

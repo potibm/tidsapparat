@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/potibm/billedapparat/internal/app/domain"
 	"github.com/potibm/billedapparat/internal/app/repository"
+	"github.com/potibm/billedapparat/internal/app/services"
 )
 
 func (s *Server) listScheduleEntries(c *gin.Context) {
@@ -59,6 +60,8 @@ func (s *Server) createScheduleEntry(c *gin.Context) {
 
 		return
 	} else {
+		s.eventHub.Publish(c, scheduleEntry.ID, services.ActionCreate)
+
 		slog.Info("Create Schedule Entry: Successfully created schedule entry", "id", scheduleEntry.ID)
 	}
 
@@ -88,6 +91,8 @@ func (s *Server) updateScheduleEntry(c *gin.Context) {
 
 		return
 	} else {
+		s.eventHub.Publish(c, scheduleEntry.ID, services.ActionUpdate)
+
 		slog.Info("Update Schedule Entry: Successfully updated schedule entry", "id", id)
 	}
 
@@ -107,6 +112,8 @@ func (s *Server) deleteScheduleEntry(c *gin.Context) {
 
 		return
 	}
+
+	s.eventHub.Publish(c, id, services.ActionDelete)
 
 	c.JSON(http.StatusOK, gin.H{"id": id})
 }

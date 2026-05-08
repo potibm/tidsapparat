@@ -30,4 +30,7 @@ type ScheduleEntryRepository interface {
 		filters ScheduleEntryListFilters,
 	) ([]domain.ScheduleEntry, int64, error)
 	GetByID(ctx context.Context, id int64) (*domain.ScheduleEntry, error)
+	GetAllPreloaded(ctx context.Context) (domain.TimeTable, error)
+	GetByCategoryID(ctx context.Context, categoryID int64) ([]domain.ScheduleEntry, error)
+	GetByLocationID(ctx context.Context, locationID int64) ([]domain.ScheduleEntry, error)
 }

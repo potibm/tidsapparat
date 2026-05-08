@@ -25,7 +25,7 @@ interface TimeSelectorProps {
 
 export const TimeSelector = ({
   partyDays,
-  presetDurations = [15, 30, 60, 90], // Fallback, falls vom Backend nichts kommt
+  presetDurations = [15, 30, 60, 90], // Fallback if nothing comes from the backend
 }: TimeSelectorProps) => {
   const {
     date_locale: dateLocale,
@@ -33,7 +33,7 @@ export const TimeSelector = ({
     timezone: tz,
   } = useAppConfig();
 
-  const record = useRecordContext(); // NEU: Holt sich die Backend-Daten (falls im Edit-View)
+  const record = useRecordContext(); // NEW: Fetches backend data (when in edit view)
 
   // 1. Hook for the quick buttons
   const { setValue } = useFormContext();

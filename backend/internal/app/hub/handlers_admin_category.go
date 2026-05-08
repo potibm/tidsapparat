@@ -89,6 +89,8 @@ func (s *Server) updateCategory(c *gin.Context) {
 		return
 	}
 
+	s.eventHub.SyncCategoryUpdate(c.Request.Context(), category.ID)
+
 	slog.Info("Update Category: Successfully updated category", "id", id)
 
 	c.JSON(http.StatusOK, category)
@@ -107,6 +109,8 @@ func (s *Server) deleteCategory(c *gin.Context) {
 
 		return
 	}
+
+	s.eventHub.SyncCategoryUpdate(c.Request.Context(), id)
 
 	c.JSON(http.StatusOK, gin.H{"id": id})
 }

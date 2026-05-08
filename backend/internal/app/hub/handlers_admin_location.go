@@ -89,6 +89,8 @@ func (s *Server) updateLocation(c *gin.Context) {
 		return
 	}
 
+	s.eventHub.SyncLocationUpdate(c.Request.Context(), location.ID)
+
 	slog.Info("Update Location: Successfully updated location", "id", id)
 
 	c.JSON(http.StatusOK, location)
@@ -107,6 +109,8 @@ func (s *Server) deleteLocation(c *gin.Context) {
 
 		return
 	}
+
+	s.eventHub.SyncLocationUpdate(c.Request.Context(), id)
 
 	c.JSON(http.StatusOK, gin.H{"id": id})
 }

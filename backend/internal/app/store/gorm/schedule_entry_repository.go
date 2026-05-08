@@ -11,6 +11,11 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const (
+	orderStartTimeASC = "start_time ASC"
+	orderEndTimeASC   = "end_time ASC"
+)
+
 type scheduleEntryRepository struct {
 	db *gorm.DB
 }
@@ -65,11 +70,11 @@ func (r *scheduleEntryRepository) List(
 	})
 
 	if params.Sort != "start_time" {
-		query = query.Order("start_time ASC")
+		query = query.Order(orderStartTimeASC)
 	}
 
 	if params.Sort != "end_time" {
-		query = query.Order("end_time ASC")
+		query = query.Order(orderEndTimeASC)
 	}
 
 	err = query.Offset(params.Offset).
@@ -99,6 +104,77 @@ func (r *scheduleEntryRepository) GetByID(ctx context.Context, id int64) (*domai
 	entry := toDomainScheduleEntry(&dbEntry)
 
 	return entry, nil
+}
+
+func (r *scheduleEntryRepository) GetAllPreloaded(ctx context.Context) (domain.TimeTable, error) {
+	var dbEntries []dbScheduleEntry
+
+	err := r.db.WithContext(ctx).
+		Preload("Category").
+		Preload("Location").
+		Order(orderStartTimeASC).
+		Order(orderEndTimeASC).
+		Find(&dbEntries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch timetable: %w", err)
+	}
+
+	var result domain.TimeTable
+	for _, dbE := range dbEntries {
+		result = append(result, toDomainScheduleEntry(&dbE))
+	}
+
+	return result, nil
+}
+
+func (r *scheduleEntryRepository) GetByCategoryID(
+	ctx context.Context,
+	categoryID int64,
+) ([]domain.ScheduleEntry, error) {
+	var dbEntries []dbScheduleEntry
+
+	err := r.db.WithContext(ctx).
+		Where("category_id = ?", categoryID).
+		Preload("Category").
+		Preload("Location").
+		Order(orderStartTimeASC).
+		Order(orderEndTimeASC).
+		Find(&dbEntries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch schedule entries by category ID: %w", err)
+	}
+
+	var result []domain.ScheduleEntry
+	for _, dbE := range dbEntries {
+		result = append(result, *toDomainScheduleEntry(&dbE))
+	}
+
+	return result, nil
+}
+
+func (r *scheduleEntryRepository) GetByLocationID(
+	ctx context.Context,
+	locationID int64,
+) ([]domain.ScheduleEntry, error) {
+	var dbEntries []dbScheduleEntry
+
+	err := r.db.WithContext(ctx).
+		Where("location_id = ?", locationID).
+		Preload("Category").
+		Preload("Location").
+		Order(orderStartTimeASC).
+		Order(orderEndTimeASC).
+		Find(&dbEntries).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch schedule entries by location ID: %w", err)
+	}
+
+	var result []domain.ScheduleEntry
+	for _, dbE := range dbEntries {
+		result = append(result, *toDomainScheduleEntry(&dbE))
+	}
+
+	return result, nil
 }
 
 func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.ScheduleEntryListFilters) *gorm.DB {

@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/potibm/billedapparat/internal/app/config"
 	"github.com/potibm/billedapparat/internal/app/repository"
+	"github.com/potibm/billedapparat/internal/app/services"
 	sloggin "github.com/samber/slog-gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
@@ -37,12 +38,14 @@ type Config struct {
 	ScheduleEntryRepo repository.ScheduleEntryRepository
 	CategoryRepo      repository.CategoryRepository
 	LocationRepo      repository.LocationRepository
+	EventHub          *services.EventHub
 	Cfg               config.Config
 }
 
 type Server struct {
 	port              int
 	staticFiles       embed.FS
+	eventHub          *services.EventHub
 	scheduleEntryRepo repository.ScheduleEntryRepository
 	categoryRepo      repository.CategoryRepository
 	locationRepo      repository.LocationRepository
@@ -53,6 +56,10 @@ type Server struct {
 func NewServer(cfg Config) (*Server, error) {
 	logger := slog.Default()
 
+	if cfg.EventHub == nil {
+		return nil, fmt.Errorf("event hub is nil")
+	}
+
 	return &Server{
 		port:              cfg.Port,
 		staticFiles:       cfg.StaticFiles,
@@ -60,6 +67,7 @@ func NewServer(cfg Config) (*Server, error) {
 		categoryRepo:      cfg.CategoryRepo,
 		locationRepo:      cfg.LocationRepo,
 		cfg:               cfg.Cfg,
+		eventHub:          cfg.EventHub,
 		logger:            logger.With("component", "HubServer"),
 	}, nil
 }
