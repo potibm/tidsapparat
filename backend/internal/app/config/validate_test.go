@@ -24,6 +24,11 @@ func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
 			Environment:             "development",
 			Version:                 "1.2.3",
 		},
+		Party: PartyConfig{
+			Timezone:  "Europe/Berlin",
+			StartDate: "2024-01-01",
+			EndDate:   "2024-01-02",
+		},
 	}
 
 	// 1. trigger validation
