@@ -5,6 +5,8 @@ import { LocationRecord } from "../locations/location.types";
 export interface ScheduleEntryRecord extends RaRecord {
   id: string | number;
   title: string;
+  description?: string;
+  external_url?: string;
   start_time: string; // ISO string from the DB
   end_time: string; // ISO string from the DB
   category_id?: number;

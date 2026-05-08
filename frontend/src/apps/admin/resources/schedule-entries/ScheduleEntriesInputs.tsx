@@ -12,6 +12,8 @@ export const ScheduleEntriesInputs = () => {
 
       <TextInput source="description" multiline />
 
+      <TextInput source="external_url" label="External URL" />
+
       <TimeSelector partyDays={partyDays} presetDurations={eventDurations} />
 
       <ReferenceInput source="location_id" reference="locations">

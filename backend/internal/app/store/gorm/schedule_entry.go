@@ -11,6 +11,7 @@ type dbScheduleEntry struct {
 
 	Title       string
 	Description string
+	ExternalURL string
 	StartTime   time.Time
 	EndTime     time.Time
 	CategoryID  *int64
@@ -29,6 +30,7 @@ func fromDomainScheduleEntry(s *domain.ScheduleEntry) *dbScheduleEntry {
 
 		Title:       s.Title,
 		Description: s.Description,
+		ExternalURL: s.ExternalURL,
 		StartTime:   s.StartTime,
 		EndTime:     s.EndTime,
 		CategoryID:  s.CategoryID,
@@ -51,6 +53,7 @@ func toDomainScheduleEntry(db *dbScheduleEntry) *domain.ScheduleEntry {
 		ID:          db.ID,
 		Title:       db.Title,
 		Description: db.Description,
+		ExternalURL: db.ExternalURL,
 		StartTime:   db.StartTime,
 		EndTime:     db.EndTime,
 		CategoryID:  db.CategoryID,
