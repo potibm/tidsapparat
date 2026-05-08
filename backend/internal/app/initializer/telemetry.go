@@ -3,7 +3,7 @@ package initializer
 import (
 	"context"
 
-	"github.com/potibm/billedapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/config"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"

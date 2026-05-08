@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/getsentry/sentry-go"
-	"github.com/potibm/billedapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/config"
 )
 
 func InitializeSentry(sentryConfig config.SentryConfig) {
@@ -12,7 +12,7 @@ func InitializeSentry(sentryConfig config.SentryConfig) {
 		Dsn:           sentryConfig.DSN,
 		Environment:   sentryConfig.Environment,
 		EnableTracing: true,
-		Release:       "billedapparat@" + sentryConfig.Version,
+		Release:       "tidsapparat@" + sentryConfig.Version,
 		// Set TracesSampleRate to 1.0 to capture 100%
 		// of transactions for tracing.
 		// We recommend adjusting this value in production,

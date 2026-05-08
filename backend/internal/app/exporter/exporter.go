@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
 const defaultTimeout = 30 * time.Second

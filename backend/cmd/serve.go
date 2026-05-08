@@ -9,12 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/potibm/billedapparat/internal/app/exporter"
-	"github.com/potibm/billedapparat/internal/app/hub"
-	"github.com/potibm/billedapparat/internal/app/initializer"
-	"github.com/potibm/billedapparat/internal/app/repository"
-	"github.com/potibm/billedapparat/internal/app/services"
-	store "github.com/potibm/billedapparat/internal/app/store/gorm"
+	"github.com/potibm/tidsapparat/internal/app/exporter"
+	"github.com/potibm/tidsapparat/internal/app/hub"
+	"github.com/potibm/tidsapparat/internal/app/initializer"
+	"github.com/potibm/tidsapparat/internal/app/repository"
+	"github.com/potibm/tidsapparat/internal/app/services"
+	store "github.com/potibm/tidsapparat/internal/app/store/gorm"
 )
 
 //go:embed assets
@@ -33,7 +33,7 @@ var (
 func NewServeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "serve",
-		Short: "Runs the HTTP server for the Billedapparat application",
+		Short: "Runs the HTTP server for the Tidsapparat application",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return ensureAppInfrastructure()
 		},

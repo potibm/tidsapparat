@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/potibm/billedapparat/internal/app/domain"
-	"github.com/potibm/billedapparat/internal/app/repository"
+	"github.com/potibm/tidsapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/repository"
 )
 
 func (s *Server) listCategories(c *gin.Context) {

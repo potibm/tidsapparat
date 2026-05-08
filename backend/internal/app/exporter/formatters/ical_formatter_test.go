@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 	"github.com/stretchr/testify/assert"
 )
 

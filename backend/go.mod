@@ -1,4 +1,4 @@
-module github.com/potibm/billedapparat
+module github.com/potibm/tidsapparat
 
 go 1.25.0
 

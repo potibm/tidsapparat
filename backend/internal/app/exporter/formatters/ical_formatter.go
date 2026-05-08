@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	ics "github.com/arran4/golang-ical"
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
 type IcalFormatter struct {

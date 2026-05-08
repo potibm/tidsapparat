@@ -6,10 +6,10 @@ import (
 	"log/slog"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/potibm/billedapparat/internal/app/config"
-	"github.com/potibm/billedapparat/internal/app/exporter"
-	"github.com/potibm/billedapparat/internal/app/exporter/formatters"
-	"github.com/potibm/billedapparat/internal/app/exporter/writers"
+	"github.com/potibm/tidsapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/exporter"
+	"github.com/potibm/tidsapparat/internal/app/exporter/formatters"
+	"github.com/potibm/tidsapparat/internal/app/exporter/writers"
 )
 
 func BootstrapExporters(

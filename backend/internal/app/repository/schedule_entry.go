@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
 type ScheduleEntryListFilters struct {

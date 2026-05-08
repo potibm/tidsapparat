@@ -14,9 +14,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/potibm/billedapparat/internal/app/config"
-	"github.com/potibm/billedapparat/internal/app/repository"
-	"github.com/potibm/billedapparat/internal/app/services"
+	"github.com/potibm/tidsapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/repository"
+	"github.com/potibm/tidsapparat/internal/app/services"
 	sloggin "github.com/samber/slog-gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )

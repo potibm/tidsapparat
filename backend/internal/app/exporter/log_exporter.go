@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
 type LogExporter struct{}
