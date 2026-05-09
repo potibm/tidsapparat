@@ -3,7 +3,7 @@ package gorm
 import (
 	"time"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 	"gorm.io/gorm"
 )
 

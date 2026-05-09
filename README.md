@@ -15,7 +15,6 @@ It is a editor for timetables at [demoparties](https://en.wikipedia.org/wiki/Dem
 - [React](https://react.dev)
   - [Vite](https://vitejs.dev/)
   - [React Admin](https://marmelab.com/react-admin/)
-  - [Flowbite React](https://flowbite-react.com) & [Tailwind CSS](https://tailwindcss.com)
 - [SQLite](https://www.sqlite.org)
 - Observability
   - [Sentry](https://sentry.io)

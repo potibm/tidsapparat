@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
-	"github.com/potibm/billedapparat/internal/app/repository"
+	"github.com/potibm/tidsapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/repository"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

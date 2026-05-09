@@ -1,4 +1,4 @@
-# AGENTS.md — Billedapparat
+# AGENTS.md — Tidsapparat
 
 Compact cheat-sheet for OpenCode. Omit anything an agent could guess from filenames.
 
@@ -6,7 +6,7 @@ Compact cheat-sheet for OpenCode. Omit anything an agent could guess from filena
 
 ## Repo layout
 
-- **Go backend**: `backend/` (module `github.com/potibm/billedapparat`)
+- **Go backend**: `backend/` (module `github.com/potibm/tidsapparat`)
 - **React frontend**: `frontend/` (Vite + React Admin + Tailwind v4)
 - **Infra**: `docker-compose.yaml` (OpenObserve + OTel collector)
 - **Root `go.work`**: points only to `./backend`. Run Go commands from `backend/`.
@@ -37,7 +37,7 @@ Frontend tests: `mise run fe:test`
 Lint everything: `mise run lint`  
 Lint with auto-fix: `mise run lint --fix`
 
-Docker image check: `mise run docker:build` (uses a custom `billedapparat-builder` buildx builder)
+Docker image check: `mise run docker:build` (uses a custom `tidsapparat-builder` buildx builder)
 
 ---
 

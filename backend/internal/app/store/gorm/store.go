@@ -7,7 +7,7 @@ import (
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 
-	"github.com/potibm/billedapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/config"
 )
 
 type Store struct {

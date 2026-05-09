@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/potibm/billedapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/config"
 )
 
 type AppConfigPublic struct {

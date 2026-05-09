@@ -16,7 +16,7 @@ target "tidsapparat" {
   
   annotations = [
     "index,manifest:org.opencontainers.image.title=Tidsapparat",
-    "index,manifest:org.opencontainers.image.description=A party information system for the bigscreen at demoparties.",
+    "index,manifest:org.opencontainers.image.description=An editor for timetables at demoparties.",
     "index,manifest:org.opencontainers.image.url=https://github.com/potibm/tidsapparat",
     "index,manifest:org.opencontainers.image.source=https://github.com/potibm/tidsapparat",
     "index,manifest:org.opencontainers.image.documentation=https://github.com/potibm/tidsapparat/tree/main/doc",

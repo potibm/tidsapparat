@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"github.com/potibm/billedapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
 type dbCategory struct {

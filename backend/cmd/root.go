@@ -12,8 +12,8 @@ import (
 
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/joho/godotenv"
-	"github.com/potibm/billedapparat/internal/app/config"
-	"github.com/potibm/billedapparat/internal/app/initializer"
+	"github.com/potibm/tidsapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/initializer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -91,7 +91,7 @@ func Execute() error {
 	rootCmd.PersistentFlags().String(logFormatFlagName, "json", "Log Format (json, text)")
 	_ = viper.BindPFlag("app.log_format", rootCmd.PersistentFlags().Lookup(logFormatFlagName))
 
-	rootCmd.PersistentFlags().String(databaseFileFlagName, "billedapparat.db", "Dateiname der SQLite Datenbank")
+	rootCmd.PersistentFlags().String(databaseFileFlagName, "tidsapparat", "Filename of the SQLite database")
 	_ = viper.BindPFlag("app.db_filename", rootCmd.PersistentFlags().Lookup(databaseFileFlagName))
 
 	rootCmd.AddCommand(NewServeCmd())

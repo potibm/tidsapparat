@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/potibm/billedapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/config"
 	"github.com/redis/go-redis/v9"
 )
 

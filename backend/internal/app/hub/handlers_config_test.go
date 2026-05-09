@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/potibm/billedapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/config"
 	"github.com/stretchr/testify/assert"
 )
 

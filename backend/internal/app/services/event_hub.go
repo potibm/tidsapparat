@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/potibm/billedapparat/internal/app/domain"
-	"github.com/potibm/billedapparat/internal/app/exporter"
+	"github.com/potibm/tidsapparat/internal/app/domain"
+	"github.com/potibm/tidsapparat/internal/app/exporter"
 	"github.com/redis/go-redis/v9"
 )
 

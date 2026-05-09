@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/potibm/billedapparat/internal/app/seeder"
-	store "github.com/potibm/billedapparat/internal/app/store/gorm"
+	"github.com/potibm/tidsapparat/internal/app/seeder"
+	store "github.com/potibm/tidsapparat/internal/app/store/gorm"
 	"github.com/spf13/cobra"
 )
 
