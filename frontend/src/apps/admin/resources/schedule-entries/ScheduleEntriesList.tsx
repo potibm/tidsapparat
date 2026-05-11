@@ -108,11 +108,7 @@ export const ScheduleEntriesList = () => (
       />
 
       {/* 2. TITLE */}
-      <TextField
-        source="title"
-        label="Event Name"
-        sx={{ fontWeight: "bold" }}
-      />
+      <TextField source="title" label="Event Name" />
 
       {/* 3. START TIME */}
       <FunctionField

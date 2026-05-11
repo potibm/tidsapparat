@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
-	"os"
 
 	"github.com/potibm/tidsapparat/internal/app/seeder"
 	store "github.com/potibm/tidsapparat/internal/app/store/gorm"
@@ -81,18 +80,6 @@ func performDatabaseReset(dbName string) error {
 	return nil
 }
 
-func performMediaReset(directory string) error {
-	slog.Info("Performing media reset...")
-
-	if err := os.RemoveAll(directory); err != nil {
-		return fmt.Errorf("failed to delete media directory: %w", err)
-	}
-
-	slog.Info("Media reset completed successfully!")
-
-	return nil
-}
-
 func seedDatabase() error {
 	slog.Info("Starting database seeding...")
 
@@ -107,7 +94,11 @@ func seedDatabase() error {
 		}
 	}()
 
-	s := seeder.NewSeeder(dbStore.NewScheduleEntryRepository())
+	s := seeder.NewSeeder(
+		dbStore.NewScheduleEntryRepository(),
+		dbStore.NewCategoryRepository(),
+		dbStore.NewLocationRepository(),
+	)
 	if err := s.Run(); err != nil {
 		return fmt.Errorf("seeding error: %w", err)
 	}
