@@ -2,6 +2,7 @@ package initializer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -10,6 +11,11 @@ import (
 	"github.com/potibm/tidsapparat/internal/app/exporter"
 	"github.com/potibm/tidsapparat/internal/app/exporter/formatters"
 	"github.com/potibm/tidsapparat/internal/app/exporter/writers"
+)
+
+var (
+	errUnknownType = errors.New("unknown exporter type")
+	errUnknownDest = errors.New("unknown destination")
 )
 
 func BootstrapExporters(
@@ -25,46 +31,28 @@ func BootstrapExporters(
 	exporterLog := slog.With("component", "Exporter")
 
 	for _, cfg := range configs {
-		var f exporter.Formatter
+		if !cfg.Enabled {
+			exporterLog.Debug("Skipping disabled exporter", "name", cfg.Name)
 
-		switch cfg.Type {
-		case "ical":
-			f = formatters.NewIcalFormatter(
-				"-//Tidsapparat//Schedule "+version+"//EN",
-				partyCfg.Timezone,
-				partyCfg.DefaultAddress,
-			)
-		default:
+			continue
+		}
+
+		f, err := buildFormatter(cfg, version, partyCfg)
+		if err != nil {
 			baseLog.Error("Unknown exporter type", "type", cfg.Type)
 
 			continue
 		}
 
-		var w exporter.Writer
+		w, err := buildWriter(cfg, s3Client)
+		if err != nil {
+			if errors.Is(err, errUnknownDest) {
+				baseLog.Error("Unknown destination", "dest", cfg.Destination)
 
-		switch cfg.Destination {
-		case "s3":
-			if s3Client == nil {
-				return nil, fmt.Errorf("exporter %s requires s3, but s3client is not configured", cfg.Name)
+				continue
 			}
 
-			bucket := cfg.Options["bucket"]
-			if bucket == "" {
-				return nil, fmt.Errorf("exporter %s: destination 's3' requires 'bucket' option", cfg.Name)
-			}
-
-			w = writers.NewS3Writer(s3Client, bucket)
-		case "file":
-			dir := cfg.Options["dir"]
-			if dir == "" {
-				return nil, fmt.Errorf("exporter %s: destination 'file' requires 'dir' option", cfg.Name)
-			}
-
-			w = &writers.FileWriter{BaseDir: dir}
-		default:
-			baseLog.Error("Unknown destination", "dest", cfg.Destination)
-
-			continue
+			return nil, err
 		}
 
 		ex := exporter.NewUniversalExporter(
@@ -78,4 +66,48 @@ func BootstrapExporters(
 	}
 
 	return result, nil
+}
+
+func buildFormatter(
+	cfg config.ExporterConfig,
+	version string,
+	partyCfg config.PartyConfig,
+) (exporter.Formatter, error) {
+	switch cfg.Type {
+	case "ical":
+		return formatters.NewIcalFormatter(
+			"-//Tidsapparat//Schedule "+version+"//EN",
+			partyCfg.Timezone,
+			partyCfg.DefaultAddress,
+		), nil
+	default:
+		return nil, errUnknownType
+	}
+}
+
+func buildWriter(cfg config.ExporterConfig, s3Client *s3.Client) (exporter.Writer, error) {
+	switch cfg.Destination {
+	case "s3":
+		if s3Client == nil {
+			return nil, fmt.Errorf("exporter %s requires s3, but s3client is not configured", cfg.Name)
+		}
+
+		bucket := cfg.Options["bucket"]
+		if bucket == "" {
+			return nil, fmt.Errorf("exporter %s: destination 's3' requires 'bucket' option", cfg.Name)
+		}
+
+		return writers.NewS3Writer(s3Client, bucket), nil
+
+	case "file":
+		dir := cfg.Options["dir"]
+		if dir == "" {
+			return nil, fmt.Errorf("exporter %s: destination 'file' requires 'dir' option", cfg.Name)
+		}
+
+		return &writers.FileWriter{BaseDir: dir}, nil
+
+	default:
+		return nil, errUnknownDest
+	}
 }
