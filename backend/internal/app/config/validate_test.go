@@ -9,12 +9,13 @@ import (
 func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
 	cfg := &Config{
 		App: AppConfig{
-			GinMode:     "debug",
-			Environment: "development",
-			LogLevel:    "info",
-			LogFormat:   "text",
-			DbFilename:  "test.db",
-			FrontendURL: "http://localhost:3000",
+			GinMode:          "debug",
+			Environment:      "development",
+			LogLevel:         "info",
+			LogFormat:        "text",
+			DbFilename:       "test.db",
+			CorsAllowOrigins: []string{"https://localhost:3333", "https://localhost:3121"},
+			FrontendURL:      "http://localhost:3000",
 		},
 		Sentry: SentryConfig{
 			DSN:                     "https://test@sentry.io/123",
