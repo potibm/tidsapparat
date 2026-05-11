@@ -27,6 +27,12 @@ func BootstrapExporters(
 	for _, cfg := range configs {
 		var f exporter.Formatter
 
+		if !cfg.Enabled {
+			exporterLog.Debug("Skipping disabled exporter", "name", cfg.Name)
+
+			continue
+		}
+
 		switch cfg.Type {
 		case "ical":
 			f = formatters.NewIcalFormatter(

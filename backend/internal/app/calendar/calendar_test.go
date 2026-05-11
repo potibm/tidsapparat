@@ -1,4 +1,4 @@
-package seeder
+package calendar
 
 import (
 	"testing"
@@ -46,11 +46,11 @@ func TestGetWeekdayRelative(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getWeekdayRelative(tt.now, tt.targetWeekday)
+			got := GetWeekdayRelative(tt.now, tt.targetWeekday)
 
 			gotFormat := got.Format("2006-01-02")
 			if gotFormat != tt.want {
-				t.Errorf("getWeekdayRelative() = %v, want %v", gotFormat, tt.want)
+				t.Errorf("GetWeekdayRelative() = %v, want %v", gotFormat, tt.want)
 			}
 		})
 	}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/potibm/tidsapparat/internal/app/calendar"
 	"github.com/potibm/tidsapparat/internal/app/domain"
 	"github.com/potibm/tidsapparat/internal/app/repository"
 )
@@ -130,9 +131,9 @@ func (s *Seeder) seedCategories(ctx context.Context) error {
 }
 
 func (s *Seeder) seedSchedule(ctx context.Context) error {
-	friday := getWeekdayCurrentWeek(time.Friday)
-	saturday := getWeekdayCurrentWeek(time.Saturday)
-	sunday := getWeekdayCurrentWeek(time.Sunday)
+	friday := calendar.GetWeekdayCurrentWeek(time.Friday)
+	saturday := calendar.GetWeekdayCurrentWeek(time.Saturday)
+	sunday := calendar.GetWeekdayCurrentWeek(time.Sunday)
 	baseURL := "https://example.com/"
 	scheduleEntries := make([]domain.ScheduleEntry, 0)
 
@@ -504,27 +505,6 @@ func (s *Seeder) createScheduleEntry(
 
 func createAddressString() string {
 	return gofakeit.Address().Address
-}
-
-func getWeekdayRelative(now time.Time, weekday time.Weekday) time.Time {
-	currentWeekday := int(now.Weekday())
-	targetWeekday := int(weekday)
-
-	if targetWeekday == int(time.Sunday) {
-		targetWeekday = 7
-	}
-
-	if currentWeekday == int(time.Sunday) {
-		currentWeekday = 7
-	}
-
-	daysUntilWeekday := targetWeekday - currentWeekday
-
-	return now.AddDate(0, 0, daysUntilWeekday)
-}
-
-func getWeekdayCurrentWeek(weekday time.Weekday) time.Time {
-	return getWeekdayRelative(time.Now(), weekday)
 }
 
 func getDayAtTime(date time.Time, timeStr string) time.Time {

@@ -23,23 +23,24 @@ type AppConfig struct {
 
 	DbFilename         string                 `mapstructure:"db_filename"         validate:"required"`
 	FrontendURL        string                 `mapstructure:"frontend_url"        validate:"required,http_url"`
-	CorsAllowOrigins   CorsAllowOriginsConfig `mapstructure:"cors_allow_origins"  validate:"dive,required"`
+	CorsAllowOrigins   CorsAllowOriginsConfig `mapstructure:"cors_allow_origins"  validate:"required,dive,required"`
 	EnvironmentMessage string                 `mapstructure:"environment_message"`
 	RedisURL           RedisURL               `mapstructure:"redis_url"           validate:"omitempty,url"`
 }
 
 type ExporterConfig struct {
-	Name        string            `mapstructure:"name"`
-	Type        string            `mapstructure:"type"`
-	Destination string            `mapstructure:"destination"`
-	Filename    string            `mapstructure:"filename"`
+	Name        string            `mapstructure:"name"        validate:"required"`
+	Type        string            `mapstructure:"type"        validate:"required,oneof=ical"`
+	Destination string            `mapstructure:"destination" validate:"required,oneof=s3 file"`
+	Filename    string            `mapstructure:"filename"    validate:"required"`
 	Options     map[string]string `mapstructure:"options"`
+	Enabled     bool              `mapstructure:"enabled"`
 }
 
 type CorsAllowOriginsConfig []string
 
 type PartyConfig struct {
-	Timezone       string `mapstructure:"timezone"        validate:"required"`
+	Timezone       string `mapstructure:"timezone"        validate:"required,timezone"`
 	DefaultAddress string `mapstructure:"default_address"`
 	StartDate      string `mapstructure:"start_date"      validate:"required,datetime=2006-01-02"`
 	EndDate        string `mapstructure:"end_date"        validate:"required,datetime=2006-01-02"`
@@ -53,10 +54,23 @@ type S3ClientConfig struct {
 	UsePathStyle    bool   `mapstructure:"use_path_style"`
 }
 
+type FormatConfig struct {
+	Date DateFormatConfig `json:"date" mapstructure:"date"`
+}
+
+type DateFormatOptionsConfig map[string]any
+
+type DateFormatConfig struct {
+	Locale  string                  `json:"locale"  mapstructure:"locale"  validate:"required"`
+	Options DateFormatOptionsConfig `json:"options" mapstructure:"options"`
+}
+
 type Config struct {
-	App      AppConfig        `mapstructure:"app"`
-	Sentry   SentryConfig     `mapstructure:"sentry"`
-	Exporter []ExporterConfig `mapstructure:"exporter"`
-	Party    PartyConfig      `mapstructure:"party"`
-	S3Client *S3ClientConfig  `mapstructure:"s3_client"`
+	App            AppConfig        `mapstructure:"app"`
+	Format         FormatConfig     `mapstructure:"format"`
+	Sentry         SentryConfig     `mapstructure:"sentry"`
+	Exporter       []ExporterConfig `mapstructure:"exporter"`
+	Party          PartyConfig      `mapstructure:"party"`
+	S3Client       *S3ClientConfig  `mapstructure:"s3_client"`
+	EventDurations []int            `mapstructure:"event_durations" validate:"dive,gte=0"`
 }

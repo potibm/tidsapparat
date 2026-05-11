@@ -31,7 +31,37 @@ func TestBootstrapExporters_EmptyConfigs(t *testing.T) {
 
 func TestBootstrapExporters_UnknownType(t *testing.T) {
 	configs := []config.ExporterConfig{
-		{Name: "unknown-exporter", Type: "unknown", Destination: "file", Options: map[string]string{"dir": "/tmp"}},
+		{
+			Name:        "unknown-exporter",
+			Enabled:     true,
+			Type:        "unknown",
+			Destination: "file",
+			Options:     map[string]string{"dir": "/tmp"},
+		},
+	}
+
+	exporters, err := BootstrapExporters(
+		context.Background(),
+		"1.0.0",
+		config.PartyConfig{Timezone: "Europe/Berlin"},
+		configs,
+		nil,
+		newTestLogger(),
+	)
+
+	require.NoError(t, err)
+	assert.Empty(t, exporters)
+}
+
+func TestBootstrapExporters_DisabledExporter(t *testing.T) {
+	configs := []config.ExporterConfig{
+		{
+			Name:        "disabled-exporter",
+			Enabled:     false,
+			Type:        "ical",
+			Destination: "file",
+			Options:     map[string]string{"dir": "/tmp"},
+		},
 	}
 
 	exporters, err := BootstrapExporters(
@@ -49,7 +79,7 @@ func TestBootstrapExporters_UnknownType(t *testing.T) {
 
 func TestBootstrapExporters_UnknownDestination(t *testing.T) {
 	configs := []config.ExporterConfig{
-		{Name: "ical-ftp", Type: "ical", Destination: "ftp", Options: map[string]string{}},
+		{Name: "ical-ftp", Enabled: true, Type: "ical", Destination: "ftp", Options: map[string]string{}},
 	}
 
 	exporters, err := BootstrapExporters(
@@ -69,6 +99,7 @@ func TestBootstrapExporters_IcalFileSuccess(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-file",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "file",
 			Filename:    "schedule",
@@ -94,6 +125,7 @@ func TestBootstrapExporters_FileMissingDir(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-file",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "file",
 			Filename:    "schedule",
@@ -118,6 +150,7 @@ func TestBootstrapExporters_IcalS3Success(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-s3",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "s3",
 			Filename:    "schedule",
@@ -145,6 +178,7 @@ func TestBootstrapExporters_S3MissingClient(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-s3",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "s3",
 			Filename:    "schedule",
@@ -169,6 +203,7 @@ func TestBootstrapExporters_S3MissingBucket(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-s3",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "s3",
 			Filename:    "schedule",
@@ -195,6 +230,7 @@ func TestBootstrapExporters_MixedConfigs(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-file",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "file",
 			Filename:    "schedule",
@@ -202,6 +238,7 @@ func TestBootstrapExporters_MixedConfigs(t *testing.T) {
 		},
 		{
 			Name:        "unknown-type",
+			Enabled:     true,
 			Type:        "csv",
 			Destination: "file",
 			Filename:    "data",
@@ -209,6 +246,7 @@ func TestBootstrapExporters_MixedConfigs(t *testing.T) {
 		},
 		{
 			Name:        "unknown-dest",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "ftp",
 			Filename:    "calendar",
@@ -216,6 +254,7 @@ func TestBootstrapExporters_MixedConfigs(t *testing.T) {
 		},
 		{
 			Name:        "ical-s3",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "s3",
 			Filename:    "schedule",
@@ -250,6 +289,7 @@ func TestBootstrapExporters_ProductIDIncludesVersion(t *testing.T) {
 	configs := []config.ExporterConfig{
 		{
 			Name:        "ical-file",
+			Enabled:     true,
 			Type:        "ical",
 			Destination: "file",
 			Filename:    "schedule",
