@@ -46,9 +46,13 @@ func BootstrapExporters(
 
 		w, err := buildWriter(cfg, s3Client)
 		if err != nil {
-			baseLog.Error("Unknown destination", "dest", cfg.Destination)
+			if errors.Is(err, errUnknownDest) {
+				baseLog.Error("Unknown destination", "dest", cfg.Destination)
 
-			continue
+				continue
+			}
+
+			return nil, err
 		}
 
 		ex := exporter.NewUniversalExporter(
