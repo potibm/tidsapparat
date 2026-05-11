@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"log/slog"
 
@@ -93,13 +91,4 @@ func NewConfigCreateCmd() *cobra.Command {
 		StringVarP(&configCreateFilename, "output", "o", "config/config.yaml", "Filename for the generated config file")
 
 	return cmd
-}
-
-func generateSecureToken(byteLength int) (string, error) {
-	bytes := make([]byte, byteLength)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", fmt.Errorf("error while generating the token: %w", err)
-	}
-
-	return hex.EncodeToString(bytes), nil
 }
