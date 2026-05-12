@@ -12,6 +12,8 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+const streamName = "party:schedule:events"
+
 type ScheduleSource interface {
 	GetByCategoryID(ctx context.Context, categoryID int64) ([]domain.ScheduleEntry, error)
 	GetByLocationID(ctx context.Context, locationID int64) ([]domain.ScheduleEntry, error)
@@ -130,7 +132,7 @@ func (h *EventHub) sendToStream(ctx context.Context, data interface{}) {
 	}
 
 	err = h.redis.XAdd(ctx, &redis.XAddArgs{
-		Stream: "party:schedule:events",
+		Stream: streamName,
 		Values: map[string]interface{}{"data": jsonData},
 	}).Err()
 	if err != nil {
