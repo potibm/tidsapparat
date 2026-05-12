@@ -20,6 +20,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { ScheduleEntryRecord } from "./schedule_entry.types";
 import { LocationWithIcon } from "@admin/components/fields/LocationWithIcon";
+import { BooleanToggleField } from "@admin/components/fields/BooleanToggleField";
 
 dayjs.extend(isBetween);
 
@@ -90,8 +91,11 @@ export const ScheduleEntriesList = () => (
           const now = dayjs();
           const start = dayjs(record.start_time);
           const end = dayjs(record.end_time);
+          const hidden = record.hidden;
 
-          if (now.isBetween(start, end)) {
+          if (hidden) {
+            return <Chip label="Hidden" size="small" variant="outlined" />;
+          } else if (now.isBetween(start, end)) {
             return (
               <Chip
                 label="Live"
@@ -114,9 +118,6 @@ export const ScheduleEntriesList = () => (
           }
         }}
       />
-
-      {/* 2. HIDDEN */}
-      <BooleanField source="hidden" label="Hidden" />
 
       {/* 3. TITLE */}
       <TextField source="title" label="Event Name" />
@@ -179,6 +180,8 @@ export const ScheduleEntriesList = () => (
       >
         <ChipField source="name" />
       </ReferenceField>
+
+      <BooleanToggleField source="hidden" label="Hidden" />
     </DatagridConfigurable>
   </List>
 );
