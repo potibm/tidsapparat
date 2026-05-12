@@ -9,6 +9,7 @@ export interface ScheduleEntryRecord extends RaRecord {
   external_url?: string;
   start_time: string; // ISO string from the DB
   end_time: string; // ISO string from the DB
+  hidden?: boolean;
   category_id?: number;
   category?: CategoryRecord;
   location_id?: number;
@@ -20,6 +21,7 @@ export interface ScheduleFormData {
   party_day: string;
   duration_mins: number;
   title?: string;
+  hidden?: boolean;
   category_id?: number;
   location_id?: number;
   [key: string]: unknown;

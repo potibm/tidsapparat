@@ -9,6 +9,7 @@ import {
   ExportButton,
   SelectColumnsButton,
   BooleanInput,
+  BooleanField,
   ReferenceField,
   ChipField,
   ReferenceInput,
@@ -107,7 +108,10 @@ export const ScheduleEntriesList = () => (
         }}
       />
 
-      {/* 2. TITLE */}
+      {/* 2. HIDDEN */}
+      <BooleanField source="hidden" label="Hidden" />
+
+      {/* 3. TITLE */}
       <TextField source="title" label="Event Name" />
 
       {/* 3. START TIME */}

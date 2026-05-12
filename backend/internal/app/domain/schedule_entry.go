@@ -11,6 +11,7 @@ type ScheduleEntry struct {
 	ExternalURL string    `json:"external_url"`
 	StartTime   time.Time `json:"start_time"`
 	EndTime     time.Time `json:"end_time"`
+	Hidden      bool      `json:"hidden"`
 	CategoryID  *int64    `json:"category_id,omitempty"`
 	Category    *Category `json:"category,omitempty"`
 	LocationID  *int64    `json:"location_id,omitempty"`
