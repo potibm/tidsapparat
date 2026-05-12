@@ -4,7 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/potibm/protokolapparat/pkg/schedule"
 	"github.com/potibm/tidsapparat/internal/app/domain"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +17,7 @@ func TestMapToEntryDTO(t *testing.T) {
 	tests := []struct {
 		name     string
 		entry    *domain.ScheduleEntry
-		expected ScheduleEntryDTO
+		expected schedule.Entry
 	}{
 		{
 			name: "full entry with category and location",
@@ -37,7 +39,7 @@ func TestMapToEntryDTO(t *testing.T) {
 					Address: &address,
 				},
 			},
-			expected: ScheduleEntryDTO{
+			expected: schedule.Entry{
 				ID:          1,
 				Title:       "Opening Ceremony",
 				Description: "The grand opening",
@@ -45,11 +47,11 @@ func TestMapToEntryDTO(t *testing.T) {
 				StartTime:   "2024-06-15T10:30:00Z",
 				EndTime:     "2024-06-15T12:30:00Z",
 				Hidden:      false,
-				Category: &CategoryDTO{
+				Category: &schedule.Category{
 					Name:  "Ceremony",
 					Color: "#FF0000",
 				},
-				Location: &LocationDTO{
+				Location: &schedule.Location{
 					Name:    "Main Hall",
 					Address: "123 Main St",
 				},
@@ -65,7 +67,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				StartTime:   now,
 				EndTime:     now.Add(1 * time.Hour),
 			},
-			expected: ScheduleEntryDTO{
+			expected: schedule.Entry{
 				ID:          2,
 				Title:       "Lunch Break",
 				Description: "Free time",
@@ -90,13 +92,13 @@ func TestMapToEntryDTO(t *testing.T) {
 					Address: strPtr(""),
 				},
 			},
-			expected: ScheduleEntryDTO{
+			expected: schedule.Entry{
 				ID:        3,
 				Title:     "Quick Meeting",
 				StartTime: "2024-06-15T10:30:00Z",
 				EndTime:   "2024-06-15T11:00:00Z",
 				Hidden:    false,
-				Location: &LocationDTO{
+				Location: &schedule.Location{
 					Name: "Room A",
 				},
 			},
@@ -113,13 +115,13 @@ func TestMapToEntryDTO(t *testing.T) {
 					Name: "Park",
 				},
 			},
-			expected: ScheduleEntryDTO{
+			expected: schedule.Entry{
 				ID:        4,
 				Title:     "Outdoor Event",
 				StartTime: "2024-06-15T10:30:00Z",
 				EndTime:   "2024-06-15T11:15:00Z",
 				Hidden:    false,
-				Location: &LocationDTO{
+				Location: &schedule.Location{
 					Name: "Park",
 				},
 			},
@@ -128,37 +130,13 @@ func TestMapToEntryDTO(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := mapToEntryDTO(tt.entry)
+			result := mapToEventPayload(tt.entry)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
 
-func TestMapToEventDTO(t *testing.T) {
-	now := time.Date(2024, 6, 15, 10, 0, 0, 0, time.UTC)
-	entry := &domain.ScheduleEntry{
-		ID:        1,
-		Title:     "Test Event",
-		StartTime: now,
-		EndTime:   now.Add(time.Hour),
-	}
-
-	result := mapToEventDTO(entry, ActionCreate)
-
-	assert.Equal(t, ActionCreate, result.Action)
-	assert.Equal(t, ScheduleEntryDTO{
-		ID:        1,
-		Title:     "Test Event",
-		StartTime: "2024-06-15T10:00:00Z",
-		EndTime:   "2024-06-15T11:00:00Z",
-		Hidden:    false,
-	}, result.Payload)
-
-	// Timestamp should be within the last second
-	assert.InDelta(t, time.Now().Unix(), result.Timestamp, 1)
-}
-
-func TestMapToTimeTableDTO(t *testing.T) {
+func TestMapToTimeTablePayload(t *testing.T) {
 	now := time.Date(2024, 6, 15, 10, 0, 0, 0, time.UTC)
 
 	entries := domain.TimeTable{
@@ -176,17 +154,17 @@ func TestMapToTimeTableDTO(t *testing.T) {
 		},
 	}
 
-	result := mapToTimeTableDTO(entries)
+	result := mapToTimeTablePayload(entries)
 
 	assert.Len(t, result, 2)
-	assert.Equal(t, ScheduleEntryDTO{
+	assert.Equal(t, schedule.Entry{
 		ID:        1,
 		Title:     "First",
 		StartTime: "2024-06-15T10:00:00Z",
 		EndTime:   "2024-06-15T11:00:00Z",
 		Hidden:    false,
 	}, result[0])
-	assert.Equal(t, ScheduleEntryDTO{
+	assert.Equal(t, schedule.Entry{
 		ID:        2,
 		Title:     "Second",
 		StartTime: "2024-06-15T12:00:00Z",
@@ -195,8 +173,8 @@ func TestMapToTimeTableDTO(t *testing.T) {
 	}, result[1])
 }
 
-func TestMapToTimeTableDTO_Empty(t *testing.T) {
-	result := mapToTimeTableDTO(domain.TimeTable{})
+func TestMapToTimeTablePayload_Empty(t *testing.T) {
+	result := mapToTimeTablePayload(domain.TimeTable{})
 
 	assert.NotNil(t, result)
 	assert.Empty(t, result)

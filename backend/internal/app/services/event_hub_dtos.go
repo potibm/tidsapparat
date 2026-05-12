@@ -3,6 +3,7 @@ package services
 import (
 	"time"
 
+	"github.com/potibm/protokolapparat/pkg/schedule"
 	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
@@ -15,42 +16,8 @@ const (
 	ActionSync   ActionType = "sync"
 )
 
-type ScheduleSyncEventDTO struct {
-	Action    ActionType         `json:"action"`
-	Timestamp int64              `json:"timestamp"`
-	Payload   []ScheduleEntryDTO `json:"payload"`
-}
-
-type ScheduleEventDTO struct {
-	Action    ActionType       `json:"action"`
-	Timestamp int64            `json:"timestamp"`
-	Payload   ScheduleEntryDTO `json:"payload"`
-}
-
-type ScheduleEntryDTO struct {
-	ID          int64        `json:"id"`
-	Title       string       `json:"title"`
-	Description string       `json:"description"`
-	ExternalURL string       `json:"external_url"`
-	StartTime   string       `json:"start_time"` // RFC3339
-	EndTime     string       `json:"end_time"`   // RFC3339
-	Hidden      bool         `json:"hidden"`
-	Category    *CategoryDTO `json:"category,omitempty"`
-	Location    *LocationDTO `json:"location,omitempty"`
-}
-
-type CategoryDTO struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
-}
-
-type LocationDTO struct {
-	Name    string `json:"name"`
-	Address string `json:"address,omitempty"`
-}
-
-func mapToEntryDTO(entry *domain.ScheduleEntry) ScheduleEntryDTO {
-	dto := ScheduleEntryDTO{
+func mapToEventPayload(entry *domain.ScheduleEntry) schedule.Entry {
+	result := schedule.Entry{
 		ID:          entry.ID,
 		Title:       entry.Title,
 		Description: entry.Description,
@@ -61,37 +28,29 @@ func mapToEntryDTO(entry *domain.ScheduleEntry) ScheduleEntryDTO {
 	}
 
 	if entry.Category != nil {
-		dto.Category = &CategoryDTO{
+		result.Category = &schedule.Category{
 			Name:  entry.Category.Name,
 			Color: entry.Category.Color,
 		}
 	}
 
 	if entry.Location != nil {
-		dto.Location = &LocationDTO{
+		result.Location = &schedule.Location{
 			Name: entry.Location.Name,
 		}
 
 		if entry.Location.Address != nil && *entry.Location.Address != "" {
-			dto.Location.Address = *entry.Location.Address
+			result.Location.Address = *entry.Location.Address
 		}
 	}
 
-	return dto
+	return result
 }
 
-func mapToEventDTO(entry *domain.ScheduleEntry, action ActionType) ScheduleEventDTO {
-	return ScheduleEventDTO{
-		Action:    action,
-		Timestamp: time.Now().Unix(),
-		Payload:   mapToEntryDTO(entry),
-	}
-}
-
-func mapToTimeTableDTO(entries domain.TimeTable) []ScheduleEntryDTO {
-	dtos := make([]ScheduleEntryDTO, 0, len(entries))
+func mapToTimeTablePayload(entries domain.TimeTable) []schedule.Entry {
+	dtos := make([]schedule.Entry, 0, len(entries))
 	for _, entry := range entries {
-		dtos = append(dtos, mapToEntryDTO(entry))
+		dtos = append(dtos, mapToEventPayload(entry))
 	}
 
 	return dtos

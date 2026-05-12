@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
-	"time"
 
+	"github.com/potibm/protokolapparat/pkg/common"
+	"github.com/potibm/protokolapparat/pkg/schedule"
 	"github.com/potibm/tidsapparat/internal/app/domain"
 	"github.com/potibm/tidsapparat/internal/app/exporter"
 	"github.com/redis/go-redis/v9"
@@ -36,31 +37,22 @@ func NewEventHub(e *exporter.Manager, redisClient *redis.Client, repo ScheduleSo
 	}
 }
 
-func (h *EventHub) Publish(ctx context.Context, entryID int64, action ActionType) {
-	if h.redis != nil {
-		var eventDTO ScheduleEventDTO
-
-		if action == ActionDelete {
-			eventDTO = ScheduleEventDTO{
-				Action:    action,
-				Timestamp: time.Now().Unix(),
-				Payload:   ScheduleEntryDTO{ID: entryID},
-			}
-		} else {
-			entry, err := h.repo.GetByID(ctx, entryID)
-			if err != nil {
-				h.logger.Error("Failed to fetch schedule entry", "id", entryID, "error", err)
-
-				return
-			}
-
-			eventDTO = mapToEventDTO(entry, action)
-		}
-
-		h.sendToStream(ctx, eventDTO)
+func (h *EventHub) PublishCreate(ctx context.Context, entryID int64) {
+	entry, err := h.getProtocolEntry(ctx, entryID)
+	if err == nil {
+		h.send(ctx, common.NewCreateEvent(entry))
 	}
+}
 
-	h.exporter.Ping()
+func (h *EventHub) PublishUpdate(ctx context.Context, entryID int64) {
+	entry, err := h.getProtocolEntry(ctx, entryID)
+	if err == nil {
+		h.send(ctx, common.NewUpdateEvent(entry))
+	}
+}
+
+func (h *EventHub) PublishDelete(ctx context.Context, entryID int64) {
+	h.send(ctx, common.NewDeleteEvent(schedule.Entry{ID: entryID}))
 }
 
 func (h *EventHub) PublishFullSync(ctx context.Context) {
@@ -75,13 +67,10 @@ func (h *EventHub) PublishFullSync(ctx context.Context) {
 		return
 	}
 
-	syncEvent := ScheduleSyncEventDTO{
-		Action:    ActionSync,
-		Timestamp: time.Now().Unix(),
-		Payload:   mapToTimeTableDTO(timetable),
-	}
+	mappedEntries := mapToTimeTablePayload(timetable)
+	syncEvent := common.NewSyncEvent(mappedEntries)
 
-	h.sendToStream(ctx, syncEvent)
+	h.sendToStream(ctx, mappedEntries)
 
 	h.logger.Info("Sent full state sync event to Redis", "count", len(syncEvent.Payload))
 }
@@ -90,7 +79,7 @@ func (h *EventHub) SyncCategoryUpdate(ctx context.Context, catID int64) {
 	entries, _ := h.repo.GetByCategoryID(ctx, catID)
 
 	for _, entry := range entries {
-		h.Publish(ctx, entry.ID, "updated")
+		h.PublishUpdate(ctx, entry.ID)
 	}
 
 	h.exporter.Ping()
@@ -100,9 +89,35 @@ func (h *EventHub) SyncLocationUpdate(ctx context.Context, locationID int64) {
 	entries, _ := h.repo.GetByLocationID(ctx, locationID)
 
 	for _, entry := range entries {
-		h.Publish(ctx, entry.ID, "updated")
+		h.PublishUpdate(ctx, entry.ID)
 	}
 
+	h.exporter.Ping()
+}
+
+func (h *EventHub) getProtocolEntry(ctx context.Context, entryID int64) (schedule.Entry, error) {
+	dbEntry, err := h.repo.GetByID(ctx, entryID)
+	if err != nil {
+		h.logger.Error("Failed to fetch schedule entry", "id", entryID, "error", err)
+
+		return schedule.Entry{}, err
+	}
+
+	return mapToEventPayload(dbEntry), nil
+}
+
+func (h *EventHub) send(ctx context.Context, event common.Event[schedule.Entry]) {
+	if h.redis == nil {
+		return
+	}
+
+	if err := event.Validate(); err != nil {
+		h.logger.Error("Tried to publish invalid event", "error", err, "action", event.Action)
+
+		return
+	}
+
+	h.sendToStream(ctx, event)
 	h.exporter.Ping()
 }
 
