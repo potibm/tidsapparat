@@ -41,7 +41,10 @@ export const BooleanToggleField = ({
           notify(`Status updated`, { type: "success" });
         },
         onError: (error) => {
-          notify(`Error while updating status: ${error.message}`, {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+
+          notify(`Error while updating status: ${errorMessage}`, {
             type: "error",
           });
         },
