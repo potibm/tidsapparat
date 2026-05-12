@@ -50,6 +50,13 @@ const scheduleFilters = [
     label="Hide Past Events"
     alwaysOn
   />,
+
+  <BooleanInput
+    key="hide_hidden"
+    source="hide_hidden"
+    label="Hide Hidden Events"
+    alwaysOn
+  />,
 ];
 
 const ListActions = () => (
@@ -66,7 +73,7 @@ export const ScheduleEntriesList = () => (
     sort={{ field: "id", order: "DESC" }}
     actions={<ListActions />}
     filters={scheduleFilters}
-    filterDefaultValues={{ hide_past: true }}
+    filterDefaultValues={{ hide_past: true, hide_hidden: true }}
   >
     <DatagridConfigurable
       rowClick="edit"
