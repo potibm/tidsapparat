@@ -14,7 +14,7 @@ type dbScheduleEntry struct {
 	ExternalURL string
 	StartTime   time.Time
 	EndTime     time.Time
-	Hidden      bool
+	Hidden      bool `gorm:"not null;default:false"`
 	CategoryID  *int64
 	Category    *dbCategory `gorm:"foreignKey:CategoryID"`
 	LocationID  *int64
