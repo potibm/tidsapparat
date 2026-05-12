@@ -14,6 +14,7 @@ type dbScheduleEntry struct {
 	ExternalURL string
 	StartTime   time.Time
 	EndTime     time.Time
+	Hidden      bool `gorm:"not null;default:false"`
 	CategoryID  *int64
 	Category    *dbCategory `gorm:"foreignKey:CategoryID"`
 	LocationID  *int64
@@ -33,6 +34,7 @@ func fromDomainScheduleEntry(s *domain.ScheduleEntry) *dbScheduleEntry {
 		ExternalURL: s.ExternalURL,
 		StartTime:   s.StartTime,
 		EndTime:     s.EndTime,
+		Hidden:      s.Hidden,
 		CategoryID:  s.CategoryID,
 		LocationID:  s.LocationID,
 	}
@@ -56,6 +58,7 @@ func toDomainScheduleEntry(db *dbScheduleEntry) *domain.ScheduleEntry {
 		ExternalURL: db.ExternalURL,
 		StartTime:   db.StartTime,
 		EndTime:     db.EndTime,
+		Hidden:      db.Hidden,
 		CategoryID:  db.CategoryID,
 		Category:    category,
 		LocationID:  db.LocationID,

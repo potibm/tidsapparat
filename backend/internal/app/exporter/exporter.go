@@ -71,6 +71,13 @@ func (m *Manager) RunAll() {
 		return
 	}
 
+	filtered := make(domain.TimeTable, 0, len(timetable))
+	for _, entry := range timetable {
+		if !entry.Hidden {
+			filtered = append(filtered, entry)
+		}
+	}
+
 	var wg sync.WaitGroup
 	for _, e := range m.exporters {
 		wg.Add(1)
@@ -80,7 +87,7 @@ func (m *Manager) RunAll() {
 
 			m.logger.Info("Starting", "exporter", exp.Name())
 
-			if err := exp.Export(ctx, timetable); err != nil {
+			if err := exp.Export(ctx, filtered); err != nil {
 				m.logger.Error("Failed", "exporter", exp.Name(), "error", err)
 			} else {
 				m.logger.Info("Finished successfully", "exporter", exp.Name())

@@ -34,6 +34,7 @@ type ScheduleEntryDTO struct {
 	ExternalURL string       `json:"external_url"`
 	StartTime   string       `json:"start_time"` // RFC3339
 	EndTime     string       `json:"end_time"`   // RFC3339
+	Hidden      bool         `json:"hidden"`
 	Category    *CategoryDTO `json:"category,omitempty"`
 	Location    *LocationDTO `json:"location,omitempty"`
 }
@@ -56,6 +57,7 @@ func mapToEntryDTO(entry *domain.ScheduleEntry) ScheduleEntryDTO {
 		ExternalURL: entry.ExternalURL,
 		StartTime:   entry.StartTime.Format(time.RFC3339),
 		EndTime:     entry.EndTime.Format(time.RFC3339),
+		Hidden:      entry.Hidden,
 	}
 
 	if entry.Category != nil {

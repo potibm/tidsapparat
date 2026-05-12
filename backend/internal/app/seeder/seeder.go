@@ -498,6 +498,7 @@ func (s *Seeder) createScheduleEntry(
 		ExternalURL: externalURL,
 		LocationID:  locationPointer,
 		CategoryID:  categoryPointer,
+		Hidden:      false,
 	}
 
 	return scheduleEntry

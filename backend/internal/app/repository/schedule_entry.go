@@ -12,6 +12,7 @@ type ScheduleEntryListFilters struct {
 	LocationID *int64
 	ID         *int64
 	HidePast   bool
+	HideHidden bool
 }
 
 type ScheduleEntryListParams struct {

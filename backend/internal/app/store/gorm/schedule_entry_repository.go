@@ -200,5 +200,9 @@ func (r *scheduleEntryRepository) applyFilters(db *gorm.DB, f repository.Schedul
 		db = db.Where("end_time > ?", now)
 	}
 
+	if f.HideHidden {
+		db = db.Where("hidden = ?", false)
+	}
+
 	return db
 }

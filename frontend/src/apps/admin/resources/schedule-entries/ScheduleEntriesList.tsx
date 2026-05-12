@@ -13,46 +13,40 @@ import {
   ChipField,
   ReferenceInput,
   SelectInput,
+  FilterButton,
 } from "react-admin";
 import { Chip } from "@mui/material";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { ScheduleEntryRecord } from "./schedule_entry.types";
 import { LocationWithIcon } from "@admin/components/fields/LocationWithIcon";
+import { BooleanToggleField } from "@admin/components/fields/BooleanToggleField";
 
 dayjs.extend(isBetween);
 
 const scheduleFilters = [
   <SearchInput key="q" source="q" alwaysOn placeholder="Search by title..." />,
 
-  <ReferenceInput
-    key="category_id"
-    source="category_id"
-    reference="categories"
-    alwaysOn
-  >
+  <ReferenceInput key="category_id" source="category_id" reference="categories">
     <SelectInput label="Category" optionText="name" />
   </ReferenceInput>,
 
-  <ReferenceInput
-    key="location_id"
-    source="location_id"
-    reference="locations"
-    alwaysOn
-  >
+  <ReferenceInput key="location_id" source="location_id" reference="locations">
     <SelectInput label="Location" optionText="name" />
   </ReferenceInput>,
 
+  <BooleanInput key="hide_past" source="hide_past" label="Hide past" />,
+
   <BooleanInput
-    key="hide_past"
-    source="hide_past"
-    label="Hide Past Events"
-    alwaysOn
+    key="hide_hidden"
+    source="hide_hidden"
+    label="Show only visible"
   />,
 ];
 
 const ListActions = () => (
   <TopToolbar>
+    <FilterButton />
     <SelectColumnsButton />
     <CreateButton />
     <ExportButton />
@@ -65,7 +59,7 @@ export const ScheduleEntriesList = () => (
     sort={{ field: "id", order: "DESC" }}
     actions={<ListActions />}
     filters={scheduleFilters}
-    filterDefaultValues={{ hide_past: true }}
+    filterDefaultValues={{ hide_past: true, hide_hidden: true }}
   >
     <DatagridConfigurable
       rowClick="edit"
@@ -82,8 +76,11 @@ export const ScheduleEntriesList = () => (
           const now = dayjs();
           const start = dayjs(record.start_time);
           const end = dayjs(record.end_time);
+          const hidden = record.hidden;
 
-          if (now.isBetween(start, end)) {
+          if (hidden) {
+            return <Chip label="Hidden" size="small" variant="outlined" />;
+          } else if (now.isBetween(start, end)) {
             return (
               <Chip
                 label="Live"
@@ -107,7 +104,7 @@ export const ScheduleEntriesList = () => (
         }}
       />
 
-      {/* 2. TITLE */}
+      {/* 3. TITLE */}
       <TextField source="title" label="Event Name" />
 
       {/* 3. START TIME */}
@@ -168,6 +165,8 @@ export const ScheduleEntriesList = () => (
       >
         <ChipField source="name" />
       </ReferenceField>
+
+      <BooleanToggleField source="hidden" label="Hidden" />
     </DatagridConfigurable>
   </List>
 );
