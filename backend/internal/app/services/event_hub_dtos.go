@@ -7,15 +7,6 @@ import (
 	"github.com/potibm/tidsapparat/internal/app/domain"
 )
 
-type ActionType string
-
-const (
-	ActionCreate ActionType = "create"
-	ActionUpdate ActionType = "update"
-	ActionDelete ActionType = "delete"
-	ActionSync   ActionType = "sync"
-)
-
 func mapToEventPayload(entry *domain.ScheduleEntry) schedule.Entry {
 	result := schedule.Entry{
 		ID:          entry.ID,
