@@ -9,11 +9,11 @@ import {
   ExportButton,
   SelectColumnsButton,
   BooleanInput,
-  BooleanField,
   ReferenceField,
   ChipField,
   ReferenceInput,
   SelectInput,
+  FilterButton,
 } from "react-admin";
 import { Chip } from "@mui/material";
 import dayjs from "dayjs";
@@ -27,41 +27,26 @@ dayjs.extend(isBetween);
 const scheduleFilters = [
   <SearchInput key="q" source="q" alwaysOn placeholder="Search by title..." />,
 
-  <ReferenceInput
-    key="category_id"
-    source="category_id"
-    reference="categories"
-    alwaysOn
-  >
+  <ReferenceInput key="category_id" source="category_id" reference="categories">
     <SelectInput label="Category" optionText="name" />
   </ReferenceInput>,
 
-  <ReferenceInput
-    key="location_id"
-    source="location_id"
-    reference="locations"
-    alwaysOn
-  >
+  <ReferenceInput key="location_id" source="location_id" reference="locations">
     <SelectInput label="Location" optionText="name" />
   </ReferenceInput>,
 
-  <BooleanInput
-    key="hide_past"
-    source="hide_past"
-    label="Hide Past Events"
-    alwaysOn
-  />,
+  <BooleanInput key="hide_past" source="hide_past" label="Hide past" />,
 
   <BooleanInput
     key="hide_hidden"
     source="hide_hidden"
-    label="Hide Hidden Events"
-    alwaysOn
+    label="Show only visible"
   />,
 ];
 
 const ListActions = () => (
   <TopToolbar>
+    <FilterButton />
     <SelectColumnsButton />
     <CreateButton />
     <ExportButton />
