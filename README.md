@@ -40,4 +40,4 @@ mise run dev
 
 ## Documentation
 
-_todo_
+Please refer to the [configuration](doc/configuration.md) and [sync](doc/sync.md) documentation. Further information will be added soon.

@@ -8,8 +8,11 @@ func (c Config) RedactConfigForDisplay() Config {
 	result := c
 
 	result.Sentry.DSN = redacted
-	result.S3Client.AccessKeyID = redacted
-	result.S3Client.SecretAccessKey = redacted
+	if result.S3Client != nil {
+		result.S3Client.AccessKeyID = redacted
+		result.S3Client.SecretAccessKey = redacted
+	}
+
 	result.App.RedisURL = result.App.RedisURL.Redacted()
 
 	return result
