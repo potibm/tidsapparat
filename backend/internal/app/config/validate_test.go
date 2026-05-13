@@ -49,21 +49,106 @@ func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
 }
 
 func TestAppConfig_Validate(t *testing.T) {
-	cfg := AppConfig{
-		GinMode:     "debug",
-		Environment: "development",
-		LogLevel:    "info",
-		LogFormat:   "text",
-		DbFilename:  "test.db",
-		FrontendURL: "http://localhost:3000",
+	t.Run("valid config", func(t *testing.T) {
+		cfg := AppConfig{
+			GinMode:     "debug",
+			Environment: "development",
+			LogLevel:    "info",
+			LogFormat:   "text",
+			DbFilename:  "test.db",
+			FrontendURL: "http://localhost:3000",
+		}
+
+		err := cfg.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("invalid db filename", func(t *testing.T) {
+		cfg := AppConfig{
+			GinMode:     "debug",
+			Environment: "development",
+			LogLevel:    "info",
+			LogFormat:   "text",
+			DbFilename:  "../invalid-filename",
+			FrontendURL: "http://localhost:3000",
+		}
+
+		err := cfg.Validate()
+		assert.Error(t, err)
+	})
+
+	t.Run("valid redis url", func(t *testing.T) {
+		cfg := AppConfig{
+			GinMode:     "debug",
+			Environment: "development",
+			LogLevel:    "info",
+			LogFormat:   "text",
+			DbFilename:  "test.db",
+			FrontendURL: "http://localhost:3000",
+			RedisURL:    "redis://localhost:6379",
+		}
+
+		err := cfg.Validate()
+		assert.NoError(t, err)
+	})
+
+	t.Run("invalid redis url", func(t *testing.T) {
+		cfg := AppConfig{
+			GinMode:     "debug",
+			Environment: "development",
+			LogLevel:    "info",
+			LogFormat:   "text",
+			DbFilename:  "test.db",
+			FrontendURL: "http://localhost:3000",
+			RedisURL:    "http://localhost:6379",
+		}
+
+		err := cfg.Validate()
+		assert.Error(t, err)
+	})
+}
+
+func TestRedisURL_Validate(t *testing.T) {
+	tests := []struct {
+		name    string
+		url     RedisURL
+		wantErr bool
+	}{
+		{
+			name:    "valid redis URL",
+			url:     "redis://localhost:6379",
+			wantErr: false,
+		},
+		{
+			name:    "valid rediss URL",
+			url:     "rediss://localhost:6379",
+			wantErr: false,
+		},
+		{
+			name:    "invalid scheme",
+			url:     "http://localhost:6379",
+			wantErr: true,
+		},
+		{
+			name:    "missing host",
+			url:     "redis://:6379",
+			wantErr: true,
+		},
+		{
+			name:    "invalid URL",
+			url:     "://invalid",
+			wantErr: true,
+		},
 	}
 
-	err := cfg.Validate()
-	assert.NoError(t, err)
-
-	cfg.DbFilename = "../invalid-filename"
-	err = cfg.Validate()
-	assert.Error(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.url.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 func TestPartyConfig_Validate(t *testing.T) {
