@@ -72,7 +72,7 @@ func (h *EventHub) PublishFullSync(ctx context.Context) {
 	mappedEntries := mapToTimeTablePayload(timetable)
 	syncEvent := common.NewSyncEvent(mappedEntries)
 
-	h.sendToStream(ctx, mappedEntries)
+	h.sendToStream(ctx, syncEvent)
 
 	h.logger.Info("Sent full state sync event to Redis", "count", len(syncEvent.Payload))
 }
@@ -123,7 +123,7 @@ func (h *EventHub) send(ctx context.Context, event common.Event[schedule.Entry])
 	h.exporter.Ping()
 }
 
-func (h *EventHub) sendToStream(ctx context.Context, data interface{}) {
+func (h *EventHub) sendToStream(ctx context.Context, data common.Event[schedule.Entry]) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		h.logger.Error("Failed to marshal data for Redis", "error", err)
