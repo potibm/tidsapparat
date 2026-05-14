@@ -46,7 +46,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				ExternalURL: "https://example.com/opening",
 				StartTime:   "2024-06-15T10:30:00Z",
 				EndTime:     "2024-06-15T12:30:00Z",
-				Hidden:      false,
+				IsHidden:    false,
 				Category: &schedule.Category{
 					Name:  "Ceremony",
 					Color: "#FF0000",
@@ -74,7 +74,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				ExternalURL: "",
 				StartTime:   "2024-06-15T10:30:00Z",
 				EndTime:     "2024-06-15T11:30:00Z",
-				Hidden:      false,
+				IsHidden:    false,
 				Category:    nil,
 				Location:    nil,
 			},
@@ -97,7 +97,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				Title:     "Quick Meeting",
 				StartTime: "2024-06-15T10:30:00Z",
 				EndTime:   "2024-06-15T11:00:00Z",
-				Hidden:    false,
+				IsHidden:  false,
 				Location: &schedule.Location{
 					Name: "Room A",
 				},
@@ -120,7 +120,7 @@ func TestMapToEntryDTO(t *testing.T) {
 				Title:     "Outdoor Event",
 				StartTime: "2024-06-15T10:30:00Z",
 				EndTime:   "2024-06-15T11:15:00Z",
-				Hidden:    false,
+				IsHidden:  false,
 				Location: &schedule.Location{
 					Name: "Park",
 				},
@@ -162,14 +162,14 @@ func TestMapToTimeTablePayload(t *testing.T) {
 		Title:     "First",
 		StartTime: "2024-06-15T10:00:00Z",
 		EndTime:   "2024-06-15T11:00:00Z",
-		Hidden:    false,
+		IsHidden:  false,
 	}, result[0])
 	assert.Equal(t, schedule.Entry{
 		ID:        2,
 		Title:     "Second",
 		StartTime: "2024-06-15T12:00:00Z",
 		EndTime:   "2024-06-15T13:00:00Z",
-		Hidden:    false,
+		IsHidden:  false,
 	}, result[1])
 }
 
