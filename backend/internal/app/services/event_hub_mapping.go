@@ -15,7 +15,7 @@ func mapToEventPayload(entry *domain.ScheduleEntry) schedule.Entry {
 		ExternalURL: entry.ExternalURL,
 		StartTime:   entry.StartTime.Format(time.RFC3339),
 		EndTime:     entry.EndTime.Format(time.RFC3339),
-		Hidden:      entry.Hidden,
+		IsHidden:    entry.Hidden,
 	}
 
 	if entry.Category != nil {
