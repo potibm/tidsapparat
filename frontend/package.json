@@ -15,10 +15,10 @@
   "dependencies": {
     "@sentry/react": "^10.53.1",
     "dayjs": "^1.11.20",
-    "ra-data-json-server": "^5.14.6",
+    "ra-data-json-server": "^5.14.7",
     "randomcolor": "^0.6.2",
     "react": "^19.2.6",
-    "react-admin": "^5.14.6",
+    "react-admin": "^5.14.7",
     "react-dom": "^19.2.6",
     "zod": "^4.4.3"
   },
