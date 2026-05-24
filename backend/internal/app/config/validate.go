@@ -88,7 +88,7 @@ func (f *FormatConfig) Validate() error {
 
 func (f *DateFormatConfig) Validate() error {
 	if !validLocale.MatchString(f.Locale) {
-		return fmt.Errorf("date.locale '%s' is not a valid locale", f.Locale)
+		return fmt.Errorf("format.date.locale '%s' is not a valid locale", f.Locale)
 	}
 
 	return nil
