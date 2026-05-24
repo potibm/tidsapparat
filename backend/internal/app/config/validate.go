@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"net"
 	"regexp"
 	"time"
 
@@ -24,6 +23,14 @@ func (c *Config) Validate() error {
 		return err
 	}
 
+	if err := c.Format.Validate(); err != nil {
+		return err
+	}
+
+	if err := c.Party.Validate(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -36,30 +43,6 @@ func (f *AppConfig) Validate() error {
 		if err := f.RedisURL.Validate(); err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (ru *RedisURL) Validate() error {
-	rString := string(*ru)
-
-	if !ru.IsValid() {
-		return fmt.Errorf("redis_url '%s' is not a valid URL", rString)
-	}
-
-	redisURL := ru.URLObject()
-	if redisURL.Scheme != "redis" && redisURL.Scheme != "rediss" {
-		return fmt.Errorf(
-			"redis_url '%s' has invalid scheme '%s' (expected 'redis' or 'rediss')",
-			rString,
-			redisURL.Scheme,
-		)
-	}
-
-	host, _, err := net.SplitHostPort(redisURL.Host)
-	if err != nil || host == "" {
-		return fmt.Errorf("redis_url '%s' has missing host", rString)
 	}
 
 	return nil
@@ -94,6 +77,18 @@ func (c *PartyConfig) Validate() error {
 	days := int(end.Sub(start).Hours()/hoursInDay) + 1
 	if days > maxPartyDuration {
 		return fmt.Errorf("party duration exceeds maximum limit of %d days (current: %d)", maxPartyDuration, days)
+	}
+
+	return nil
+}
+
+func (f *FormatConfig) Validate() error {
+	return f.Date.Validate()
+}
+
+func (f *DateFormatConfig) Validate() error {
+	if !validLocale.MatchString(f.Locale) {
+		return fmt.Errorf("date.locale '%s' is not a valid locale", f.Locale)
 	}
 
 	return nil

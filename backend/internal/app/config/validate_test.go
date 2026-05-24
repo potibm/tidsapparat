@@ -2,11 +2,14 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
+	currentYear := time.Now().Format("2006")
+
 	cfg := &Config{
 		App: AppConfig{
 			GinMode:          "debug",
@@ -27,8 +30,8 @@ func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
 		},
 		Party: PartyConfig{
 			Timezone:  "Europe/Berlin",
-			StartDate: "2024-01-01",
-			EndDate:   "2024-01-02",
+			StartDate: currentYear + "-01-01",
+			EndDate:   currentYear + "-01-02",
 		},
 		Format: FormatConfig{
 			Date: DateFormatConfig{
@@ -108,50 +111,9 @@ func TestAppConfig_Validate(t *testing.T) {
 	})
 }
 
-func TestRedisURL_Validate(t *testing.T) {
-	tests := []struct {
-		name    string
-		url     RedisURL
-		wantErr bool
-	}{
-		{
-			name:    "valid redis URL",
-			url:     "redis://localhost:6379",
-			wantErr: false,
-		},
-		{
-			name:    "valid rediss URL",
-			url:     "rediss://localhost:6379",
-			wantErr: false,
-		},
-		{
-			name:    "invalid scheme",
-			url:     "http://localhost:6379",
-			wantErr: true,
-		},
-		{
-			name:    "missing host",
-			url:     "redis://:6379",
-			wantErr: true,
-		},
-		{
-			name:    "invalid URL",
-			url:     "://invalid",
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := tt.url.Validate()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestPartyConfig_Validate(t *testing.T) {
+	currentYear := time.Now().Format("2006")
+
 	tests := []struct {
 		name    string
 		config  PartyConfig
@@ -160,24 +122,32 @@ func TestPartyConfig_Validate(t *testing.T) {
 		{
 			name: "Valid range - same day",
 			config: PartyConfig{
-				StartDate: "2026-05-01",
-				EndDate:   "2026-05-01",
+				StartDate: currentYear + "-05-01",
+				EndDate:   currentYear + "-05-01",
 			},
 			wantErr: false,
 		},
 		{
 			name: "Valid range - multiple days",
 			config: PartyConfig{
-				StartDate: "2026-05-01",
-				EndDate:   "2026-05-05",
+				StartDate: currentYear + "-05-01",
+				EndDate:   currentYear + "-05-05",
 			},
 			wantErr: false,
 		},
 		{
+			name: "Invalid range - far too long ago",
+			config: PartyConfig{
+				StartDate: "1997-05-01",
+				EndDate:   "1997-05-03",
+			},
+			wantErr: true,
+		},
+		{
 			name: "Invalid - end before start",
 			config: PartyConfig{
-				StartDate: "2026-05-10",
-				EndDate:   "2026-05-01",
+				StartDate: currentYear + "-05-10",
+				EndDate:   currentYear + "-05-01",
 			},
 			wantErr: true,
 		},
@@ -185,15 +155,15 @@ func TestPartyConfig_Validate(t *testing.T) {
 			name: "Invalid - wrong date format",
 			config: PartyConfig{
 				StartDate: "01-05-2026",
-				EndDate:   "2026-05-10",
+				EndDate:   currentYear + "-05-10",
 			},
 			wantErr: true,
 		},
 		{
 			name: "Invalid - way too long (over 31 days)",
 			config: PartyConfig{
-				StartDate: "2026-05-01",
-				EndDate:   "2026-07-01",
+				StartDate: currentYear + "-05-01",
+				EndDate:   currentYear + "-07-01",
 			},
 			wantErr: true,
 		},
