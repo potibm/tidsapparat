@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import {
-  SelectInput,
+  DateInput,
   TimeInput,
   NumberInput,
   useRecordContext,
@@ -117,12 +117,41 @@ export const TimeSelector = ({
       </Typography>
 
       <Stack direction="row" spacing={2} alignItems="flex-start">
-        <SelectInput
-          source="party_day"
-          choices={partyDays}
-          label="Day"
-          required
-        />
+        <Box>
+          <DateInput sx={{ mt: 0 }} source="party_day" label="Day" required />
+
+          <Stack direction="row" spacing={1} sx={{ mt: -2, mb: 2 }}>
+            {partyDays.map((day) => {
+              const isActive = partyDay === day.id;
+
+              return (
+                <Chip
+                  key={day.id}
+                  label={day.name}
+                  size="small"
+                  color={isActive ? "primary" : "default"}
+                  variant={isActive ? "filled" : "outlined"}
+                  onClick={() =>
+                    setValue("party_day", day.id, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                      shouldTouch: true,
+                    })
+                  }
+                  sx={{
+                    cursor: "pointer",
+                    fontWeight: isActive ? "bold" : "normal",
+                    "&:hover": {
+                      backgroundColor: isActive
+                        ? "primary.main"
+                        : "action.hover",
+                    },
+                  }}
+                />
+              );
+            })}
+          </Stack>
+        </Box>
 
         <TimeInput source="start_time_only" label="Start Time" required />
 
