@@ -19,6 +19,7 @@ func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
 			DbFilename:       "test.db",
 			CorsAllowOrigins: []string{"https://localhost:3333", "https://localhost:3121"},
 			FrontendURL:      "http://localhost:3000",
+			Port:             8080,
 		},
 		Sentry: SentryConfig{
 			DSN:                     "https://test@sentry.io/123",
@@ -60,6 +61,7 @@ func TestAppConfig_Validate(t *testing.T) {
 			LogFormat:   "text",
 			DbFilename:  "test.db",
 			FrontendURL: "http://localhost:3000",
+			Port:        8080,
 		}
 
 		err := cfg.Validate()
