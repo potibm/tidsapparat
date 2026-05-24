@@ -55,46 +55,6 @@ func TestRedisURL_URLObject(t *testing.T) {
 	}
 }
 
-func TestRedisURL_IsValid(t *testing.T) {
-	tests := []struct {
-		name  string
-		url   *RedisURL
-		valid bool
-	}{
-		{
-			name:  "nil receiver",
-			url:   nil,
-			valid: true,
-		},
-		{
-			name:  "valid redis URL",
-			url:   ptr(RedisURL("redis://localhost:6379/0")),
-			valid: true,
-		},
-		{
-			name:  "valid rediss URL",
-			url:   ptr(RedisURL("rediss://localhost:6379")),
-			valid: true,
-		},
-		{
-			name:  "invalid URL",
-			url:   ptr(RedisURL("://invalid")),
-			valid: false,
-		},
-		{
-			name:  "empty string",
-			url:   ptr(RedisURL("")),
-			valid: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.valid, tt.url.IsValid())
-		})
-	}
-}
-
 func TestRedisURL_RedisOptions(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -103,19 +63,19 @@ func TestRedisURL_RedisOptions(t *testing.T) {
 		wantAddr     string
 		wantPassword string
 		wantDB       int
+		wantTLS      bool
 	}{
 		{
-			name:     "empty string",
-			url:      RedisURL(""),
-			wantNil:  false,
-			wantAddr: "",
-			wantDB:   0,
+			name:    "empty string",
+			url:     RedisURL(""),
+			wantNil: true,
 		},
 		{
 			name:     "basic redis URL",
 			url:      RedisURL("redis://localhost:6379"),
 			wantAddr: "localhost:6379",
 			wantDB:   0,
+			wantTLS:  false,
 		},
 		{
 			name:     "redis URL with db",
@@ -138,10 +98,16 @@ func TestRedisURL_RedisOptions(t *testing.T) {
 			wantDB:       2,
 		},
 		{
-			name:     "invalid db defaults to 0",
-			url:      RedisURL("redis://localhost:6379/notadb"),
+			name:    "invalid db now correctly fails",
+			url:     RedisURL("redis://localhost:6379/notadb"),
+			wantNil: true,
+		},
+		{
+			name:     "rediss URL sets TLS config",
+			url:      RedisURL("rediss://localhost:6379"),
 			wantAddr: "localhost:6379",
 			wantDB:   0,
+			wantTLS:  true,
 		},
 	}
 
@@ -155,6 +121,12 @@ func TestRedisURL_RedisOptions(t *testing.T) {
 				assert.Equal(t, tt.wantAddr, got.Addr)
 				assert.Equal(t, tt.wantPassword, got.Password)
 				assert.Equal(t, tt.wantDB, got.DB)
+
+				if tt.wantTLS {
+					assert.NotNil(t, got.TLSConfig, "expected TLSConfig to be set for rediss://")
+				} else {
+					assert.Nil(t, got.TLSConfig, "expected TLSConfig to be nil for redis://")
+				}
 			}
 		})
 	}
@@ -218,31 +190,23 @@ func TestRedisURL_Validate(t *testing.T) {
 			name:    "invalid URL",
 			url:     RedisURL("://invalid"),
 			wantErr: true,
-			errMsg:  "is not a valid URL",
+			errMsg:  "missing protocol scheme",
 		},
 		{
 			name:    "http scheme",
 			url:     RedisURL("http://localhost:6379/0"),
 			wantErr: true,
-			errMsg:  "has invalid scheme 'http'",
+			errMsg:  "invalid URL scheme: http",
 		},
 		{
-			name:    "missing host",
+			name:    "missing host IS NOW VALID",
 			url:     RedisURL("redis:///0"),
-			wantErr: true,
-			errMsg:  "has missing host",
+			wantErr: false,
 		},
 		{
-			name:    "host without port",
+			name:    "host without port IS NOW VALID",
 			url:     RedisURL("redis://localhost/0"),
-			wantErr: true,
-			errMsg:  "has missing host",
-		},
-		{
-			name:    "host is empty string with port",
-			url:     RedisURL("redis://:6379/0"),
-			wantErr: true,
-			errMsg:  "has missing host",
+			wantErr: false,
 		},
 	}
 

@@ -2,9 +2,7 @@ package config
 
 import (
 	"fmt"
-	"net"
 	"net/url"
-	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -24,43 +22,18 @@ func (ru *RedisURL) URLObject() *url.URL {
 	return parsedURL
 }
 
-func (ru *RedisURL) IsValid() bool {
-	if ru == nil {
-		return true
-	}
-
-	_, err := url.ParseRequestURI(string(*ru))
-
-	return err == nil
-}
-
 func (ru RedisURL) RedisOptions() *redis.Options {
 	u := ru.URLObject()
-
 	if u == nil {
 		return nil
 	}
 
-	path := u.Path
-	if path == "" {
-		path = "/0"
-	}
-
-	db, err := strconv.Atoi(path[1:])
+	opt, err := redis.ParseURL(u.String())
 	if err != nil {
-		db = 0
+		return nil
 	}
 
-	var password string
-	if u.User != nil {
-		password, _ = u.User.Password()
-	}
-
-	return &redis.Options{
-		Addr:     u.Host,
-		Password: password,
-		DB:       db,
-	}
+	return opt
 }
 
 func (ru *RedisURL) Validate() error {
@@ -69,26 +42,20 @@ func (ru *RedisURL) Validate() error {
 	}
 
 	rString := string(*ru)
-
-	if !ru.IsValid() {
-		return fmt.Errorf("redis_url '%s' is not a valid URL", rString)
+	if rString == "" {
+		return fmt.Errorf("redis_url is empty")
 	}
 
-	redisURL := ru.URLObject()
-	if redisURL.Scheme != "redis" && redisURL.Scheme != "rediss" {
-		return fmt.Errorf(
-			"redis_url '%s' has invalid scheme '%s' (expected 'redis' or 'rediss')",
-			rString,
-			redisURL.Scheme,
-		)
-	}
-
-	host, _, err := net.SplitHostPort(redisURL.Host)
-	if err != nil || host == "" {
-		return fmt.Errorf("redis_url '%s' has missing host", rString)
+	_, err := redis.ParseURL(rString)
+	if err != nil {
+		return fmt.Errorf("invalid redis_url '%s': %w", rString, err)
 	}
 
 	return nil
+}
+
+func (ru *RedisURL) IsValid() bool {
+	return ru.Validate() == nil
 }
 
 func (ru RedisURL) Redacted() RedisURL {
