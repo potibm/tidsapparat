@@ -24,6 +24,9 @@ type AppConfig struct {
 	CorsAllowOrigins   CorsAllowOriginsConfig `mapstructure:"cors_allow_origins"  validate:"required,dive,required"`
 	EnvironmentMessage string                 `mapstructure:"environment_message"`
 	RedisURL           RedisURL               `mapstructure:"redis_url"           validate:"omitempty,url"`
+
+	OtelEndpoint string `mapstructure:"otel_endpoint" validate:"omitempty"`
+	Port         int    `mapstructure:"port"          validate:"required,gt=0,lte=65535"`
 }
 
 type ExporterConfig struct {
