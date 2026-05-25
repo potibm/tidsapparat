@@ -21,7 +21,7 @@ tmp_dir = "tmp"
   include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html"]
   include_file = [".env"]
-  kill_delay = "3s"
+  kill_delay = "5s"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
@@ -45,7 +45,7 @@ tmp_dir = "tmp"
   time = false
 
 [misc]
-  clean_on_exit = false
+  clean_on_exit = true
 
 [proxy]
   app_port = 0

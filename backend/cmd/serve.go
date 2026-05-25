@@ -5,6 +5,9 @@ import (
 	"embed"
 	"fmt"
 	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -41,7 +44,9 @@ func NewServeCmd() *cobra.Command {
 			return ensureAppInfrastructure()
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
+			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+			defer cancel()
+
 			logger := slog.Default()
 
 			// =========================================================================
