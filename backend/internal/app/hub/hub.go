@@ -84,22 +84,35 @@ func (s *Server) Run(ctx context.Context) error {
 		Handler:           router,
 	}
 
+	serverErr := make(chan error, 1)
+
 	// Start server in Goroutine
 	go func() {
+		s.logger.Info("Starting server...", "port", s.port)
+
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("listen", "error", err)
+			serverErr <- err
 		}
 	}()
 
-	slog.Info("Server is up", "port", s.port)
+	select {
+	case err := <-serverErr:
+		return fmt.Errorf("http server failed to start: %w", err)
 
-	<-ctx.Done()
-	slog.Info("Shutting down server gracefully...")
+	case <-ctx.Done():
+		s.logger.Info("Shutting down server gracefully...")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), defaultShutdownTimeout)
-	defer cancel()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), defaultShutdownTimeout)
+		defer cancel()
 
-	return srv.Shutdown(shutdownCtx)
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("server shutdown failed: %w", err)
+		}
+
+		s.logger.Info("Server stopped cleanly")
+
+		return nil
+	}
 }
 
 func (s *Server) setupRouter() (*gin.Engine, error) {
@@ -111,7 +124,7 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 		// middleware.ErrorHandlingMiddleware(),
 		gin.Recovery(),
 		sentrygin.New(sentrygin.Options{Repanic: false}),
-		sloggin.New(slog.Default()),
+		sloggin.New(s.logger),
 		otelgin.Middleware(config.OtelBackendServiceName),
 	)
 	s.registerCorsMiddleware(r)
@@ -164,10 +177,10 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 
 func (s *Server) registerCorsMiddleware(r *gin.Engine) {
 	if len(s.cfg.App.CorsAllowOrigins) > 0 {
-		slog.Info("CORS middleware enabled", "origins", s.cfg.App.CorsAllowOrigins)
+		s.logger.Info("CORS middleware enabled", "origins", s.cfg.App.CorsAllowOrigins)
 		r.Use(s.createCorsMiddleware())
 	} else {
-		slog.Info("CORS middleware disabled (no origins configured)")
+		s.logger.Info("CORS middleware disabled (no origins configured)")
 	}
 }
 
