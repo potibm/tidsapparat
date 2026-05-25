@@ -24,4 +24,4 @@ if [[ "$1" == "--clean" ]]; then
 fi
 
 echo "🚀 Starting overmind..."
-overmind s --t 10
+overmind s --timeout 10
