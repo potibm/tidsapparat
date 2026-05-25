@@ -88,7 +88,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	// Start server in Goroutine
 	go func() {
-		s.logger.Info("Server is up", "port", s.port)
+		s.logger.Info("Starting server...", "port", s.port)
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			serverErr <- err
