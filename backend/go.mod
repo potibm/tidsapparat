@@ -19,7 +19,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/potibm/protokolapparat v1.0.3
-	github.com/redis/go-redis/v9 v9.19.0
+	github.com/redis/go-redis/v9 v9.20.0
 	github.com/samber/slog-gin v1.21.1
 	github.com/samber/slog-multi v1.8.0
 	github.com/spf13/cobra v1.10.2
