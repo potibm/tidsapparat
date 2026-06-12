@@ -9,4 +9,5 @@ echo "📊 OpenObserve:   http://localhost:3205 (admin@example.com / password123
 echo "📊 RedisInsight:  http://localhost:3206" 
 echo "📊 MinIO:         http://localhost:3207 (local-admin / local-super-secret)"
 echo "📈 OTel gRPC:     localhost:3217"
+echo "🪪 Dex OIDC:      http://localhost:3208"
 echo "----------------------------------"

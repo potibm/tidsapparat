@@ -76,6 +76,12 @@ const defaultConfig: AppConfig = {
   timezone: "Europe/Berlin",
   party_days: [],
   event_durations: [15, 30, 60, 90],
+  auth: {
+    type: "oidc",
+    name: "dex",
+    authority: "https://dex.tidsapparat.test/dex",
+    client_id: "react-admin-client",
+  },
 };
 
 function TestWrapper({
