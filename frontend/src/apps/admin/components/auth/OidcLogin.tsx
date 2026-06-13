@@ -8,7 +8,7 @@ export const OidcLogin = () => {
 
   const { auth } = useAppConfig();
 
-  const name = auth.name || "IDP";
+  const name = auth?.name || "IDP";
 
   return (
     <Login>

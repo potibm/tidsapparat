@@ -45,6 +45,12 @@ func TestConfig_PlaylistDefaultsAndValidation(t *testing.T) {
 			},
 		},
 		Exporter: []ExporterConfig{},
+		Auth: &AuthConfig{
+			Type:      "oidc",
+			Name:      "Dex",
+			Authority: "https://dex.tidsapparat.test",
+			ClientID:  "tidsapparat-frontend",
+		},
 	}
 
 	// 1. trigger validation

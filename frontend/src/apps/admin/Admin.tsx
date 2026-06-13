@@ -20,7 +20,7 @@ export const AppBootstrapper = () => {
   const appConfig = useAppConfig();
 
   const isOidcActive = appConfig.auth?.type === "oidc";
-  if (isOidcActive) {
+  if (isOidcActive && appConfig.auth?.authority && appConfig.auth?.client_id) {
     configureOidc(appConfig.auth.authority, appConfig.auth.client_id);
   }
 

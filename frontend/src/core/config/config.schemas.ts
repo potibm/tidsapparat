@@ -38,12 +38,7 @@ export const AppConfigSchema = z.object({
       authority: z.string(),
       client_id: z.string(),
     })
-    .default({
-      type: "oidc",
-      name: "dex",
-      authority: "https://dex.tidsapparat.test/dex",
-      client_id: "react-admin-client",
-    }),
+    .optional(),
 });
 
 export type AppConfig = z.infer<typeof AppConfigSchema>;

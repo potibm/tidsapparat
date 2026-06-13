@@ -19,6 +19,7 @@ type AppConfigPublic struct {
 	Timezone           string                         `json:"timezone"`
 	PartyDays          []PartyDaysPublic              `json:"party_days"`
 	EventDurations     []int                          `json:"event_durations"`
+	Auth               *config.AuthConfig             `json:"auth,omitempty"`
 }
 
 type PartyDaysPublic struct {
@@ -43,6 +44,7 @@ func mapToPublicConfig(cfg *config.Config) AppConfigPublic {
 		Timezone:           cfg.Party.Timezone,
 		PartyDays:          generatePartyDaysOrEmpty(cfg.Party.StartDate, cfg.Party.EndDate),
 		EventDurations:     cfg.EventDurations,
+		Auth:               cfg.Auth,
 	}
 }
 

@@ -52,6 +52,7 @@ overmind s --timeout 10
 ## Local Environment
 
 Once the stack is running, you can access the applications via:
+
 - Tidsapparat Admin: https://tidsapparat.test
 - Dex IdP: https://dex.tidsapparat.test
 
