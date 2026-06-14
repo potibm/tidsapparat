@@ -95,3 +95,9 @@ export const authProvider: AuthProvider = {
     return user ? user.profile.roles : [];
   },
 };
+
+export const getAccessToken = async (): Promise<string | null> => {
+  if (!userManager) return null;
+  const user = await userManager.getUser();
+  return user ? user.access_token : null;
+};

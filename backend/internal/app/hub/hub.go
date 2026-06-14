@@ -15,6 +15,7 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/potibm/tidsapparat/internal/app/config"
+	"github.com/potibm/tidsapparat/internal/app/middleware"
 	"github.com/potibm/tidsapparat/internal/app/repository"
 	"github.com/potibm/tidsapparat/internal/app/services"
 	sloggin "github.com/samber/slog-gin"
@@ -143,6 +144,25 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 	api.GET("/config", s.handleGetPublicConfig)
 
 	admin := r.Group("/api/admin")
+
+	if s.cfg.Auth.Type == "oidc" {
+		if s.cfg.Auth.SkipTLSVerify {
+			s.logger.Warn("OIDC TLS verification is disabled. This should only be used in development environments.")
+		}
+
+		authMW, err := middleware.AuthMiddleware(
+			context.Background(),
+			s.cfg.Auth.AuthorityURL,
+			s.cfg.Auth.ClientID,
+			s.cfg.Auth.SkipTLSVerify,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("setting up auth middleware: %w", err)
+		}
+
+		admin.Use(authMW)
+	}
+
 	admin.GET(pathScheduleEntries, s.listScheduleEntries)
 	admin.POST(pathScheduleEntries, s.createScheduleEntry)
 	admin.GET(pathScheduleEntriesWithID, s.getScheduleEntry)
