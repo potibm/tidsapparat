@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"
@@ -16,18 +17,25 @@ import (
 
 func AuthMiddleware(ctx context.Context, issuerURL, clientID string, skipTLSVerify bool) (gin.HandlerFunc, error) {
 	// 1. HTTP client with optional TLS verification
-	client := http.DefaultClient
+	const oidcHTTPTimeout = 10 * time.Second
+
+	baseTransport, _ := http.DefaultTransport.(*http.Transport)
+	transport := baseTransport.Clone()
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   oidcHTTPTimeout,
+	}
 
 	if skipTLSVerify {
-		customTransport := &http.Transport{
-			// #nosec G402 -- for local dev environments
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // NOSONAR
-		}
-		client = &http.Client{Transport: customTransport}
+		// #nosec G402 -- for local dev environments
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} // NOSONAR
 	}
 
 	// 2. Add the custom HTTP client to the OIDC context
-	oidcCtx := oidc.ClientContext(ctx, client)
+	setupCtx, cancel := context.WithTimeout(ctx, oidcHTTPTimeout)
+	defer cancel()
+
+	oidcCtx := oidc.ClientContext(setupCtx, client)
 
 	// 3. Initialize the OIDC Provider
 	provider, err := oidc.NewProvider(oidcCtx, issuerURL)

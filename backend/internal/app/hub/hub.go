@@ -145,8 +145,12 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 
 	admin := r.Group("/api/admin")
 
-	if s.cfg.Auth.Type == "oidc" {
+	if s.cfg.Auth != nil && s.cfg.Auth.Type == "oidc" {
 		if s.cfg.Auth.SkipTLSVerify {
+			if s.cfg.App.Environment == "production" {
+				return nil, fmt.Errorf("auth.skip_tls_verify must be false in production")
+			}
+
 			s.logger.Warn("OIDC TLS verification is disabled. This should only be used in development environments.")
 		}
 

@@ -13,7 +13,6 @@ export const configureOidc = (authority: string, clientId: string) => {
     redirect_uri: `${globalThis.location.origin}/auth-callback`,
     response_type: "code",
     scope: "openid profile email",
-    userStore: new WebStorageStateStore({ store: globalThis.localStorage }),
   });
 };
 
@@ -99,5 +98,5 @@ export const authProvider: AuthProvider = {
 export const getAccessToken = async (): Promise<string | null> => {
   if (!userManager) return null;
   const user = await userManager.getUser();
-  return user ? user.access_token : null;
+  return user && !user.expired ? user.access_token : null;
 };

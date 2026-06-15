@@ -36,7 +36,7 @@ func TestAuditCallbacks(t *testing.T) {
 	updaterID := "user-updater-456"
 	deleterID := "user-deleter-789"
 
-	t.Run("BeforeCreate setzt CreatedBy und ModifiedBy", func(t *testing.T) {
+	t.Run("BeforeCreate sets CreatedBy and ModifiedBy", func(t *testing.T) {
 		ctx := context.WithValue(context.Background(), domain.UserIDKey, creatorID)
 
 		loc := TestLocation{Name: "Main Stage"}
@@ -47,7 +47,7 @@ func TestAuditCallbacks(t *testing.T) {
 		assert.Equal(t, creatorID, loc.ModifiedBy, "ModifiedBy should be equal to CreatedBy initially")
 	})
 
-	t.Run("BeforeUpdate aktualisiert NUR ModifiedBy", func(t *testing.T) {
+	t.Run("BeforeUpdate changes ONLY ModifiedBy", func(t *testing.T) {
 		var loc TestLocation
 		db.First(&loc, 1)
 
@@ -65,7 +65,10 @@ func TestAuditCallbacks(t *testing.T) {
 		assert.Equal(t, updaterID, updatedLoc.ModifiedBy, "ModifiedBy should be updated")
 	})
 
-	t.Run("BeforeDelete setzt DeletedBy bei Soft-Deletes", func(t *testing.T) {
+	t.Run("BeforeDelete sets DeletedBy om soft delete", func(t *testing.T) {
+		untouched := TestLocation{Name: "Untouched Location"}
+		require.NoError(t, db.Create(&untouched).Error)
+
 		var loc TestLocation
 		db.First(&loc, 1)
 
@@ -81,5 +84,10 @@ func TestAuditCallbacks(t *testing.T) {
 		require.NoError(t, err)
 		assert.True(t, deletedLoc.DeletedAt.Valid, "GORM should have set DeletedAt for soft-deleted record")
 		assert.Equal(t, deleterID, deletedLoc.DeletedBy, "DeletedBy should be set to the deleter's user ID")
+
+		var untouchedReloaded TestLocation
+		db.First(&untouchedReloaded, untouched.ID)
+		assert.Empty(t, untouchedReloaded.DeletedBy, "DeletedBy should remain empty for non-deleted records")
+		assert.False(t, untouchedReloaded.DeletedAt.Valid, "DeletedAt should remain null for non-deleted records")
 	})
 }

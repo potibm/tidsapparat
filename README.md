@@ -45,7 +45,7 @@ mise run infra:prepare
 # 3. Start local services (Traefik, Dex, etc.)
 mise run infra:up
 
-# 3. Start the development server (hot-reload for backend & frontend)
+# 4. Start the development server (hot-reload for backend & frontend)
 overmind s --timeout 10
 ```
 

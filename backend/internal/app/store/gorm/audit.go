@@ -6,7 +6,7 @@ import (
 )
 
 type AuditModel struct {
-	CreatedBy  string  `json:"created_by"           gorm:"column:created_by;type:varchar(255)"`
+	CreatedBy  string  `json:"created_by"           gorm:"column:created_by;type:varchar(255);<-:create"`
 	ModifiedBy string  `json:"modified_by"          gorm:"column:modified_by;type:varchar(255)"`
 	DeletedBy  *string `json:"deleted_by,omitempty" gorm:"column:deleted_by;type:varchar(255);index"`
 }
