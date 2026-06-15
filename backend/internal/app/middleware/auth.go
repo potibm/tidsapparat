@@ -10,6 +10,8 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"
+	"github.com/potibm/tidsapparat/internal/app/domain"
+	sloggin "github.com/samber/slog-gin"
 )
 
 func AuthMiddleware(ctx context.Context, issuerURL, clientID string, skipTLSVerify bool) (gin.HandlerFunc, error) {
@@ -73,7 +75,13 @@ func AuthMiddleware(ctx context.Context, issuerURL, clientID string, skipTLSVeri
 			return
 		}
 
-		c.Set("userID", idToken.Subject)
+		userID := idToken.Subject
+
+		c.Set("userID", userID)
+		sloggin.AddCustomAttributes(c, slog.String("user_id", userID))
+
+		ctxWithUser := context.WithValue(c.Request.Context(), domain.UserIDKey, userID)
+		c.Request = c.Request.WithContext(ctxWithUser)
 
 		c.Next()
 	}, nil

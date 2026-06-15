@@ -1,0 +1,75 @@
+package gorm
+
+import (
+	"github.com/potibm/tidsapparat/internal/app/domain"
+	"gorm.io/gorm"
+)
+
+type AuditModel struct {
+	CreatedBy  string  `json:"created_by"           gorm:"column:created_by;type:varchar(255)"`
+	ModifiedBy string  `json:"modified_by"          gorm:"column:modified_by;type:varchar(255)"`
+	DeletedBy  *string `json:"deleted_by,omitempty" gorm:"column:deleted_by;type:varchar(255);index"`
+}
+
+func RegisterAuditCallbacks(db *gorm.DB) error {
+	if err := db.Callback().
+		Create().
+		Before("gorm:create").
+		Register("audit:before_create", beforeCreateCallback); err != nil {
+		return err
+	}
+
+	if err := db.Callback().
+		Update().
+		Before("gorm:update").
+		Register("audit:before_update", beforeUpdateCallback); err != nil {
+		return err
+	}
+
+	if err := db.Callback().
+		Delete().
+		Before("gorm:delete").
+		Register("audit:before_delete", beforeDeleteCallback); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getUserIDFromContext(tx *gorm.DB) string {
+	if tx.Statement.Schema == nil {
+		return ""
+	}
+
+	userID, ok := tx.Statement.Context.Value(domain.UserIDKey).(string)
+	if !ok {
+		return ""
+	}
+
+	return userID
+}
+
+func setAuditColumn(tx *gorm.DB, columnName, userID string) {
+	if field := tx.Statement.Schema.LookUpField(columnName); field != nil {
+		tx.Statement.SetColumn(columnName, userID)
+	}
+}
+
+func beforeCreateCallback(tx *gorm.DB) {
+	if userID := getUserIDFromContext(tx); userID != "" {
+		setAuditColumn(tx, "CreatedBy", userID)
+		setAuditColumn(tx, "ModifiedBy", userID)
+	}
+}
+
+func beforeUpdateCallback(tx *gorm.DB) {
+	if userID := getUserIDFromContext(tx); userID != "" {
+		setAuditColumn(tx, "ModifiedBy", userID)
+	}
+}
+
+func beforeDeleteCallback(tx *gorm.DB) {
+	if userID := getUserIDFromContext(tx); userID != "" {
+		setAuditColumn(tx, "DeletedBy", userID)
+	}
+}
