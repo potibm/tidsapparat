@@ -23,6 +23,6 @@ const httpClient = async (url: string, options: fetchUtils.Options = {}) => {
 };
 
 export const dataProvider: DataProvider = jsonServerProvider(
-  "/api/admin", 
-  httpClient
+  "/api/admin",
+  httpClient,
 );
