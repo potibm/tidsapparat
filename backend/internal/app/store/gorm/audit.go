@@ -69,7 +69,28 @@ func beforeUpdateCallback(tx *gorm.DB) {
 }
 
 func beforeDeleteCallback(tx *gorm.DB) {
-	if userID := getUserIDFromContext(tx); userID != "" {
-		setAuditColumn(tx, "DeletedBy", userID)
+	userID := getUserIDFromContext(tx)
+	if userID == "" {
+		return
+	}
+
+	setAuditColumn(tx, "DeletedBy", userID)
+
+	if tx.Statement.Schema == nil || tx.Statement.Table == "" {
+		return
+	}
+
+	field := tx.Statement.Schema.LookUpField("DeletedBy")
+	if field == nil {
+		return
+	}
+
+	clonedDB := tx.Session(&gorm.Session{})
+
+	err := clonedDB.Table(tx.Statement.Table).Updates(map[string]interface{}{
+		field.DBName: userID,
+	}).Error
+	if err != nil {
+		_ = tx.AddError(err)
 	}
 }
