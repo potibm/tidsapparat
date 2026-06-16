@@ -1,5 +1,5 @@
 import { createLogger } from "@core/logger/logger";
-import { UserManager, WebStorageStateStore } from "oidc-client-ts";
+import { UserManager } from "oidc-client-ts";
 import { AuthProvider } from "react-admin";
 
 const log = createLogger("Auth");
