@@ -3,6 +3,7 @@ package gorm
 import (
 	"github.com/potibm/tidsapparat/internal/app/domain"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type AuditModel struct {
@@ -74,9 +75,7 @@ func beforeDeleteCallback(tx *gorm.DB) {
 		return
 	}
 
-	setAuditColumn(tx, "DeletedBy", userID)
-
-	if tx.Statement.Schema == nil || tx.Statement.Table == "" {
+	if tx.Statement.Schema == nil {
 		return
 	}
 
@@ -85,12 +84,26 @@ func beforeDeleteCallback(tx *gorm.DB) {
 		return
 	}
 
-	clonedDB := tx.Session(&gorm.Session{})
+	updateQuery := tx.Session(&gorm.Session{NewDB: true})
 
-	err := clonedDB.Table(tx.Statement.Table).Updates(map[string]interface{}{
+	if tx.Statement.Dest != nil {
+		updateQuery = updateQuery.Model(tx.Statement.Dest)
+	} else {
+		updateQuery = updateQuery.Table(tx.Statement.Table)
+	}
+
+	if whereClause, ok := tx.Statement.Clauses["WHERE"]; ok {
+		if whereExpr, ok := whereClause.Expression.(clause.Where); ok {
+			updateQuery.Statement.AddClause(whereExpr)
+		}
+	}
+
+	err := updateQuery.Updates(map[string]interface{}{
 		field.DBName: userID,
 	}).Error
 	if err != nil {
 		_ = tx.AddError(err)
 	}
+
+	setAuditColumn(tx, "DeletedBy", userID)
 }
