@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+/* eslint-disable @eslint-react/set-state-in-effect */
+import { useState, useRef, useEffect } from "react";
 import { Admin, Resource } from "react-admin";
 import { BrowserRouter } from "react-router";
 import { MyTheme, MyDarkTheme } from "./theme/MyTheme";
@@ -21,20 +22,29 @@ export const AppBootstrapper = () => {
   const appConfig = useAppConfig();
   const isOidcActive = appConfig.auth?.type === "oidc";
 
-  const isConfigured = useMemo(() => {
+  const [isConfiguring, setIsConfiguring] = useState(isOidcActive);
+
+  const hasConfiguredRef = useRef(false);
+
+  useEffect(() => {
     if (!isOidcActive) {
-      return true;
+      setIsConfiguring(false);
+      return;
     }
 
-    if (appConfig.auth?.authority && appConfig.auth?.client_id) {
+    if (
+      !hasConfiguredRef.current &&
+      appConfig.auth?.authority &&
+      appConfig.auth?.client_id
+    ) {
       configureOidc(appConfig.auth.authority, appConfig.auth.client_id);
-      return true;
+      hasConfiguredRef.current = true;
+
+      setIsConfiguring(false);
     }
+  }, [isOidcActive, appConfig.auth]);
 
-    return false;
-  }, [appConfig.auth, isOidcActive]);
-
-  if (!isConfigured) {
+  if (isConfiguring) {
     return null;
   }
 
