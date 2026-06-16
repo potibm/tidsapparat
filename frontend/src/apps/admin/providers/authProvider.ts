@@ -5,6 +5,7 @@ import { AuthProvider } from "react-admin";
 const log = createLogger("Auth");
 
 let userManager: UserManager | null = null;
+let activeCallbackPromise: Promise<void> | null = null;
 
 export const configureOidc = (authority: string, clientId: string) => {
   userManager = new UserManager({
@@ -24,18 +25,23 @@ export const authProvider: AuthProvider = {
 
   handleCallback: async () => {
     if (!userManager) throw new Error("OIDC not configured");
-    try {
-      await userManager.signinRedirectCallback();
-      return;
-    } catch (error) {
-      const user = await userManager.getUser();
-      if (user && !user.expired) {
-        return;
-      }
 
-      log.error("Authentication error in callback:", error);
-      throw error instanceof Error ? error : new Error(String(error));
+    if (activeCallbackPromise) {
+      return activeCallbackPromise;
     }
+
+    activeCallbackPromise = userManager
+      .signinRedirectCallback()
+      .then(() => {})
+      .catch((error) => {
+        log.error("Authentication error in callback:", error);
+        throw error instanceof Error ? error : new Error(String(error));
+      })
+      .finally(() => {
+        activeCallbackPromise = null;
+      });
+
+    return activeCallbackPromise;
   },
 
   checkAuth: async () => {

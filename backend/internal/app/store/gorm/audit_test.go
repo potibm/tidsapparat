@@ -15,7 +15,7 @@ type TestLocation struct {
 	Name       string
 	CreatedBy  string
 	ModifiedBy string
-	DeletedBy  string
+	DeletedBy  *string
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 }
 
@@ -83,11 +83,11 @@ func TestAuditCallbacks(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.True(t, deletedLoc.DeletedAt.Valid, "GORM should have set DeletedAt for soft-deleted record")
-		assert.Equal(t, deleterID, deletedLoc.DeletedBy, "DeletedBy should be set to the deleter's user ID")
+		assert.Equal(t, deleterID, *deletedLoc.DeletedBy, "DeletedBy should be set to the deleter's user ID")
 
 		var untouchedReloaded TestLocation
 		db.First(&untouchedReloaded, untouched.ID)
-		assert.Empty(t, untouchedReloaded.DeletedBy, "DeletedBy should remain empty for non-deleted records")
+		assert.Nil(t, untouchedReloaded.DeletedBy, "DeletedBy should remain empty for non-deleted records")
 		assert.False(t, untouchedReloaded.DeletedAt.Valid, "DeletedAt should remain null for non-deleted records")
 	})
 }

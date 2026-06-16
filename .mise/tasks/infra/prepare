@@ -21,11 +21,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     exit 1
   fi
 
-  if ! command -v mkcert &> /dev/null; then
-    echo "==> 📦 Installing mkcert and nss..."
-    brew install mkcert nss
-  fi
-
   echo "==> 🔒 Setting up local Certificate Authority (CA)..."
   mkcert -install
 
@@ -56,20 +51,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 # ---------------------------------------------------------
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "==> 🐧 Detected Linux..."
-
-  if ! command -v mkcert &> /dev/null; then
-    echo "==> 📦 Installing mkcert and libnss3-tools..."
-    if command -v apt-get &> /dev/null; then
-      sudo apt-get update && sudo apt-get install -y mkcert libnss3-tools
-    elif command -v dnf &> /dev/null; then
-      sudo dnf install -y mkcert nss-tools
-    elif command -v pacman &> /dev/null; then
-      sudo pacman -S --noconfirm mkcert nss
-    else
-      echo "❌ Error: Could not detect package manager. Please install mkcert manually."
-      exit 1
-    fi
-  fi
 
   echo "==> 🔒 Setting up local Certificate Authority (CA)..."
   mkcert -install

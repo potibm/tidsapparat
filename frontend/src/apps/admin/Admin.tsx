@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Admin, Resource } from "react-admin";
 import { BrowserRouter } from "react-router";
 import { MyTheme, MyDarkTheme } from "./theme/MyTheme";
@@ -18,10 +19,23 @@ export const AdminApp = () => (
 
 export const AppBootstrapper = () => {
   const appConfig = useAppConfig();
-
   const isOidcActive = appConfig.auth?.type === "oidc";
-  if (isOidcActive && appConfig.auth?.authority && appConfig.auth?.client_id) {
-    configureOidc(appConfig.auth.authority, appConfig.auth.client_id);
+
+  const isConfigured = useMemo(() => {
+    if (!isOidcActive) {
+      return true;
+    }
+
+    if (appConfig.auth?.authority && appConfig.auth?.client_id) {
+      configureOidc(appConfig.auth.authority, appConfig.auth.client_id);
+      return true;
+    }
+
+    return false;
+  }, [appConfig.auth, isOidcActive]);
+
+  if (!isConfigured) {
+    return null;
   }
 
   return (
