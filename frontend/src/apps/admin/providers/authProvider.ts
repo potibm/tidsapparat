@@ -12,6 +12,7 @@ export const configureOidc = (authority: string, clientId: string) => {
     authority,
     client_id: clientId,
     redirect_uri: `${globalThis.location.origin}/auth-callback`,
+    post_logout_redirect_uri: `${globalThis.location.origin}/`,
     response_type: "code",
     scope: "openid profile email",
   });
@@ -63,14 +64,19 @@ export const authProvider: AuthProvider = {
     if (!userManager) return;
 
     try {
-      await userManager.signoutRedirect();
+      const user = await userManager.getUser();
+      if (user) {
+        await userManager.signoutRedirect();
+      } else {
+        await userManager.removeUser();
+      }
     } catch (error) {
       if (
         error instanceof Error &&
         error.message.includes("No end session endpoint")
       ) {
         log.warn(
-          "IdP does not support end session endpoint, clearing local user data.",
+          "IdP does not support end session endpoint, clearing local data.",
         );
         await userManager.removeUser();
       } else {
