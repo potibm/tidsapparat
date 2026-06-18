@@ -18,9 +18,9 @@
     "oidc-client-ts": "^3.5.0",
     "ra-data-json-server": "^5.14.7",
     "randomcolor": "^0.6.2",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "react-admin": "^5.14.7",
-    "react-dom": "^19.2.6",
+    "react-dom": "^19.2.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^25.9.1",
     "@types/randomcolor": "^0.5.9",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.0.2",
