@@ -19,7 +19,11 @@ func AuthMiddleware(ctx context.Context, issuerURL, clientID string, skipTLSVeri
 	// 1. HTTP client with optional TLS verification
 	const oidcHTTPTimeout = 10 * time.Second
 
-	baseTransport, _ := http.DefaultTransport.(*http.Transport)
+	baseTransport, ok := http.DefaultTransport.(*http.Transport)
+	if !ok || baseTransport == nil {
+		return nil, fmt.Errorf("default HTTP transport is not *http.Transport")
+	}
+
 	transport := baseTransport.Clone()
 	client := &http.Client{
 		Transport: transport,
@@ -63,8 +67,8 @@ func AuthMiddleware(ctx context.Context, issuerURL, clientID string, skipTLSVeri
 			return
 		}
 
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+		parts := strings.Fields(authHeader)
+		if len(parts) != 2 || !strings.EqualFold(parts[0], "bearer") {
 			reqLogger.Warn("Invalid token format", "header_length", len(parts))
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
 
