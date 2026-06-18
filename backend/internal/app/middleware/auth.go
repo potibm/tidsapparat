@@ -20,9 +20,10 @@ func AuthMiddleware(ctx context.Context, issuerURL, clientID string, skipTLSVeri
 	const oidcHTTPTimeout = 10 * time.Second
 
 	baseTransport, ok := http.DefaultTransport.(*http.Transport)
-	if !ok || baseTransport == nil {	
+	if !ok || baseTransport == nil {
 		return nil, fmt.Errorf("default HTTP transport is not *http.Transport")
 	}
+
 	transport := baseTransport.Clone()
 	client := &http.Client{
 		Transport: transport,
