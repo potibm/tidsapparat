@@ -59,6 +59,13 @@ func NewConfigCreateCmd() *cobra.Command {
 
 			viper.SetDefault("event_durations", []int{0, 15, 30, 60, 90, 120})
 
+			viper.SetDefault("auth", config.AuthConfig{
+				Type:         "oidc",
+				Name:         "Dex",
+				AuthorityURL: "https://dex.tidsapparat.test/dex",
+				ClientID:     "react-admin-client",
+			})
+
 			filename := configCreateFilename
 
 			var writeErr error

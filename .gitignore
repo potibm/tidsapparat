@@ -15,3 +15,5 @@ backend/_config.*
 backend/exports/*
 backend/tmp
 *.log
+infra/.certs/
+docker-compose.override.yaml

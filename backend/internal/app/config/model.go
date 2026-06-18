@@ -66,6 +66,14 @@ type DateFormatConfig struct {
 	Options DateFormatOptionsConfig `json:"options" mapstructure:"options"`
 }
 
+type AuthConfig struct {
+	Type          string `json:"type"      mapstructure:"type"            validate:"required,oneof=oidc"`
+	Name          string `json:"name"      mapstructure:"name"            validate:"required"`
+	AuthorityURL  string `json:"authority" mapstructure:"authority"       validate:"required,url"`
+	ClientID      string `json:"client_id" mapstructure:"client_id"       validate:"required"`
+	SkipTLSVerify bool   `json:"-"         mapstructure:"skip_tls_verify"`
+}
+
 type Config struct {
 	App            AppConfig        `mapstructure:"app"`
 	Format         FormatConfig     `mapstructure:"format"`
@@ -74,4 +82,5 @@ type Config struct {
 	Party          PartyConfig      `mapstructure:"party"`
 	S3Client       *S3ClientConfig  `mapstructure:"s3_client"`
 	EventDurations []int            `mapstructure:"event_durations" validate:"dive,gte=0"`
+	Auth           *AuthConfig      `mapstructure:"auth"            validate:"omitempty"`
 }

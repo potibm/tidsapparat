@@ -31,6 +31,14 @@ export const AppConfigSchema = z.object({
   timezone: z.string(),
   party_days: z.array(DaySchema),
   event_durations: DurationsSchema,
+  auth: z
+    .object({
+      type: z.enum(["oidc"]),
+      name: z.string(),
+      authority: z.string(),
+      client_id: z.string(),
+    })
+    .optional(),
 });
 
 export type AppConfig = z.infer<typeof AppConfigSchema>;

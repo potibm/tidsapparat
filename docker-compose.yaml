@@ -1,14 +1,59 @@
 services:
-  # Monitoring & logging backend
+  # --------------------------------------------------------
+  # Traefik Reverse Proxy
+  # --------------------------------------------------------
+  traefik:
+    image: traefik:v3.7
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--providers.file.filename=/etc/traefik/dynamic.yaml"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/.certs:/certs:ro
+      - ./infra/traefik-dynamic.yaml:/etc/traefik/dynamic.yaml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # --------------------------------------------------------
+  # Identity
+  # --------------------------------------------------------
+  dex:
+    image: ghcr.io/dexidp/dex:v2.38.0
+    volumes:
+      - ./infra/dex-config.yaml:/etc/dex/config.docker.yaml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dex.rule=Host(`dex.tidsapparat.test`)"
+      - "traefik.http.routers.dex.entrypoints=websecure"
+      - "traefik.http.routers.dex.tls=true"
+      - "traefik.http.services.dex.loadbalancer.server.port=5556"
+
+  # --------------------------------------------------------
+  # Observability
+  # --------------------------------------------------------
   openobserve:
     image: public.ecr.aws/zinclabs/openobserve:latest
     environment:
       - ZO_ROOT_USER_EMAIL=admin@example.com
       - ZO_ROOT_USER_PASSWORD=password123
-    ports:
-      - "3205:5080" # Web UI
     volumes:
       - o2_data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.observe.rule=Host(`observe.tidsapparat.test`)"
+      - "traefik.http.routers.observe.entrypoints=websecure"
+      - "traefik.http.routers.observe.tls=true"
+      - "traefik.http.services.observe.loadbalancer.server.port=5080"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -17,19 +62,21 @@ services:
       - ./backend/logs:/etc/app/logs:ro
     command: ["--config=/etc/otel/config.yaml"]
     ports:
-      - "3217:4317" # OTLP gRPC
-      - "3218:4318" # OTLP HTTP
+      - "3217:4317" # OTLP gRPC (Needed for Go backend on host)
+      - "3218:4318" # OTLP HTTP (Needed for Vite frontend on host)
     depends_on:
       - openobserve
 
+  # --------------------------------------------------------
+  # Data Stores
+  # --------------------------------------------------------
   redis:
     image: redis:7-alpine
     container_name: tidsapparat_redis
     ports:
-      - "3251:6379"
+      - "3251:6379" # Needed for Go backend on host
     volumes:
       - redis_data:/data
-    # Saves every 60 seconds if at least 1 key changes
     command: redis-server --save 60 1 --loglevel warning
 
   redisinsight:
@@ -42,25 +89,34 @@ services:
       - RI_REDIS_ALIAS0=Tidsapparat-Redis
       - RI_REDIS_HOST0=tidsapparat_redis
       - RI_REDIS_PORT0=6379
-    ports:
-      - "3206:5540"
     volumes:
       - redisinsight_data:/data
     depends_on:
       - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.redis.rule=Host(`redis.tidsapparat.test`)"
+      - "traefik.http.routers.redis.entrypoints=websecure"
+      - "traefik.http.routers.redis.tls=true"
+      - "traefik.http.services.redis.loadbalancer.server.port=5540"
 
   minio:
     image: minio/minio:latest
     container_name: tidsapparat_minio
     ports:
-      - "3250:9000"
-      - "3207:9001"
+      - "3250:9000" # S3 API (Needed for Go backend on host)
     environment:
       - MINIO_ROOT_USER=local-admin
       - MINIO_ROOT_PASSWORD=local-super-secret
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minio.rule=Host(`minio.tidsapparat.test`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.tls=true"
+      - "traefik.http.services.minio.loadbalancer.server.port=9001"
 
   minio-init:
     image: minio/mc

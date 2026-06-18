@@ -22,7 +22,7 @@ if [[ "$1" == "--clean" ]]; then
     rm -f .overmind.sock
   fi
 
-  for port in 3100 3101; do
+  for port in 3200 3201; do
     pids=$(lsof -ti:$port || true)
     if [ -n "$pids" ]; then
       echo "Killing process(es) on port $port (PIDs: $pids)..."

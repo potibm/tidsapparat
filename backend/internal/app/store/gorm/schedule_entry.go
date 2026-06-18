@@ -8,6 +8,7 @@ import (
 
 type dbScheduleEntry struct {
 	GormModel
+	AuditModel
 
 	Title       string
 	Description string

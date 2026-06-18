@@ -15,6 +15,7 @@
   "dependencies": {
     "@sentry/react": "^10.53.1",
     "dayjs": "^1.11.20",
+    "oidc-client-ts": "^3.5.0",
     "ra-data-json-server": "^5.14.7",
     "randomcolor": "^0.6.2",
     "react": "^19.2.6",

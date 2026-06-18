@@ -9,6 +9,7 @@ import (
 
 type dbLocation struct {
 	GormModel
+	AuditModel
 
 	Name    string
 	Address *string

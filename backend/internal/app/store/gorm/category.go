@@ -6,6 +6,7 @@ import (
 
 type dbCategory struct {
 	GormModel
+	AuditModel
 
 	Name  string `gorm:"not null"`
 	Color string `gorm:"default:'#888888'"`
