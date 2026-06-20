@@ -33,10 +33,10 @@ services:
       - ./infra/dex-config.yaml:/etc/dex/config.docker.yaml
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dex.rule=Host(`dex.tidsapparat.test`)"
-      - "traefik.http.routers.dex.entrypoints=websecure"
-      - "traefik.http.routers.dex.tls=true"
-      - "traefik.http.services.dex.loadbalancer.server.port=5556"
+      - "traefik.http.routers.dex-tids.rule=Host(`dex.tidsapparat.test`)"
+      - "traefik.http.routers.dex-tids.entrypoints=websecure"
+      - "traefik.http.routers.dex-tids.tls=true"
+      - "traefik.http.services.dex-tids.loadbalancer.server.port=5556"
 
   # --------------------------------------------------------
   # Observability
@@ -50,10 +50,10 @@ services:
       - o2_data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.observe.rule=Host(`observe.tidsapparat.test`)"
-      - "traefik.http.routers.observe.entrypoints=websecure"
-      - "traefik.http.routers.observe.tls=true"
-      - "traefik.http.services.observe.loadbalancer.server.port=5080"
+      - "traefik.http.routers.observe-tids.rule=Host(`observe.tidsapparat.test`)"
+      - "traefik.http.routers.observe-tids.entrypoints=websecure"
+      - "traefik.http.routers.observe-tids.tls=true"
+      - "traefik.http.services.observe-tids.loadbalancer.server.port=5080"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -95,10 +95,10 @@ services:
       - redis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.redis.rule=Host(`redis.tidsapparat.test`)"
-      - "traefik.http.routers.redis.entrypoints=websecure"
-      - "traefik.http.routers.redis.tls=true"
-      - "traefik.http.services.redis.loadbalancer.server.port=5540"
+      - "traefik.http.routers.redis-tids.rule=Host(`redis.tidsapparat.test`)"
+      - "traefik.http.routers.redis-tids.entrypoints=websecure"
+      - "traefik.http.routers.redis-tids.tls=true"
+      - "traefik.http.services.redis-tids.loadbalancer.server.port=5540"
 
   minio:
     image: minio/minio:latest
@@ -113,10 +113,10 @@ services:
       - minio_data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minio.rule=Host(`minio.tidsapparat.test`)"
-      - "traefik.http.routers.minio.entrypoints=websecure"
-      - "traefik.http.routers.minio.tls=true"
-      - "traefik.http.services.minio.loadbalancer.server.port=9001"
+      - "traefik.http.routers.minio-tids.rule=Host(`minio.tidsapparat.test`)"
+      - "traefik.http.routers.minio-tids.entrypoints=websecure"
+      - "traefik.http.routers.minio-tids.tls=true"
+      - "traefik.http.services.minio-tids.loadbalancer.server.port=9001"
 
   minio-init:
     image: minio/mc

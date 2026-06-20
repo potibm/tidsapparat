@@ -54,8 +54,14 @@ overmind s --timeout 10
 Once the stack is running, you can access the applications via:
 
 - Tidsapparat Admin: https://tidsapparat.test
-- Dex IdP: https://dex.tidsapparat.test
 
 ## Documentation
 
-Please refer to the [configuration](doc/configuration.md) and [sync](doc/sync.md) documentation. Further information will be added soon.
+Please refer to the documentation on
+
+- [configuration](doc/configuration.md)
+- [redis sync](doc/sync.md)
+- [authentication](doc/auth.md)
+- [setting up a global traefik service](doc/global-traefik.md)
+
+Further information will be added soon.
