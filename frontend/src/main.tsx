@@ -11,7 +11,7 @@ import { configureOidc } from "@admin/providers/authProvider.ts";
 import * as Sentry from "@sentry/react";
 
 const log = createLogger("Bootstrapper");
-const API_HOST = import.meta.env.VITE_API_HOST ?? "http://localhost:3201";
+const API_HOST = import.meta.env.VITE_API_HOST ?? "http://localhost:3200";
 
 export async function bootstrapApp() {
   const rootElement = document.getElementById("root");
