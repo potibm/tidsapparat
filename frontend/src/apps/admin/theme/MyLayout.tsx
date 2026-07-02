@@ -10,7 +10,7 @@ import { Logo } from "@core/logo/Logo";
 
 export const MyAppBar = (props: AppBarProps) => (
   <AppBar {...props} color="secondary">
-    <Box flex="1" display="flex" alignItems="center">
+    <Box sx={{ flex: "1", display: "flex", alignItems: "center" }}>
       <Logo
         style={{
           height: "32px",

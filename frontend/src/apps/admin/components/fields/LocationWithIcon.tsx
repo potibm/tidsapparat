@@ -7,7 +7,7 @@ export const LocationWithIcon = () => {
   if (!record) return null;
 
   return (
-    <Stack direction="row" alignItems="center" spacing={0.5}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
       <PlaceIcon fontSize="small" sx={{ color: "#BF00FF", opacity: 0.8 }} />
       <Typography
         variant="body2"
