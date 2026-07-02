@@ -116,7 +116,7 @@ export const TimeSelector = ({
         Schedule Timing
       </Typography>
 
-      <Stack direction="row" spacing={2} alignItems="flex-start">
+      <Stack direction="row" spacing={2} sx={{ alignItems: "flex-start" }}>
         <Box>
           <DateInput sx={{ mt: 0 }} source="party_day" label="Day" required />
 
@@ -223,7 +223,7 @@ export const TimeSelector = ({
         }}
       >
         <EventIcon fontSize="small" sx={{ mr: 1 }} />
-        <Typography variant="body2" fontWeight="bold">
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
           {preview}
         </Typography>
       </Box>

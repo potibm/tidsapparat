@@ -36,7 +36,7 @@ export const BooleanToggleField = ({
         previousData: record,
       },
       {
-        mutationMode: "optimistic",
+        mutationMode: "pessimistic",
         onSuccess: () => {
           notify(`Status updated`, { type: "success" });
         },

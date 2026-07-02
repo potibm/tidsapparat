@@ -2,7 +2,10 @@ import jsonServerProvider from "ra-data-json-server";
 import { DataProvider, fetchUtils } from "react-admin";
 import { getAccessToken } from "./authProvider"; // Pfad ggf. anpassen
 
-const httpClient = async (url: string, options: fetchUtils.Options = {}) => {
+export const httpClient = async (
+  url: string,
+  options: fetchUtils.Options = {},
+) => {
   if (!options.headers) {
     options.headers = new Headers({ Accept: "application/json" });
   }

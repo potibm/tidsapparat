@@ -80,11 +80,11 @@ export const MyDarkTheme: ThemeOptions = {
     },
     MuiChip: {
       styleOverrides: {
-        filledPrimary: {
-          backgroundColor: "#BF00FF",
-          color: "#FFFFFF",
-        },
         root: {
+          "&.MuiChip-filled.MuiChip-colorPrimary": {
+            backgroundColor: "#BF00FF",
+            color: "#FFFFFF",
+          },
           backgroundColor: "rgba(15, 23, 42, 0.6)",
           border: "1px solid rgba(191, 0, 255, 0.5)",
         },
