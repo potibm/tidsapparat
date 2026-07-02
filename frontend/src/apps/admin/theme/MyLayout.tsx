@@ -4,9 +4,12 @@ import {
   TitlePortal,
   Layout,
   LayoutProps,
+  Menu,
+  MenuProps,
 } from "react-admin";
 import { Typography, Box } from "@mui/material";
 import { Logo } from "@core/logo/Logo";
+import { useAppConfig } from "@core/config/useConfig";
 
 export const MyAppBar = (props: AppBarProps) => (
   <AppBar {...props} color="secondary">
@@ -36,6 +39,24 @@ export const MyAppBar = (props: AppBarProps) => (
   </AppBar>
 );
 
+export const MyMenu = (props: MenuProps) => {
+  const { version } = useAppConfig();
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <Box sx={{ flex: 1 }}>
+        <Menu {...props} />
+      </Box>
+
+      <Box sx={{ p: 2, textAlign: "center" }}>
+        <Typography variant="caption" color="text.secondary">
+          Version: {version}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
+
 export const MyLayout = (props: LayoutProps) => (
-  <Layout {...props} appBar={MyAppBar} />
+  <Layout {...props} appBar={MyAppBar} menu={MyMenu} />
 );
