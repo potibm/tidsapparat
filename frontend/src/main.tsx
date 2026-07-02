@@ -15,9 +15,18 @@ const API_HOST = import.meta.env.VITE_API_HOST ?? "http://localhost:3201";
 
 export async function bootstrapApp() {
   const rootElement = document.getElementById("root");
-  if (!rootElement) throw new Error("Failed to find the root element");
-  const root = createRoot(rootElement);
+  if (!rootElement) {
+    document.body.innerHTML = `
+      <div style="padding: 20px; color: red; font-family: sans-serif;">
+        <h2>System Configuration Error</h2>
+        <pre>Failed to find the root element in index.html</pre>
+      </div>
+    `;
+    log.error("Bootstrap failed: Root element missing");
+    return;
+  }
 
+  const root = createRoot(rootElement);
   try {
     const controller = new AbortController();
     const timeoutId = globalThis.setTimeout(() => controller.abort(), 10000);
