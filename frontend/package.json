@@ -13,7 +13,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@sentry/react": "^10.63.0",
+    "@sentry/react": "^10.65.0",
     "dayjs": "^1.11.21",
     "oidc-client-ts": "^3.5.0",
     "ra-data-json-server": "^5.15.0",
