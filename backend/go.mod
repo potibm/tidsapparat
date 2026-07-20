@@ -10,8 +10,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.26
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.104.2
 	github.com/brianvoe/gofakeit/v7 v7.15.0
-	github.com/getsentry/sentry-go v0.47.0
-	github.com/getsentry/sentry-go/gin v0.47.0
+	github.com/getsentry/sentry-go v0.48.0
+	github.com/getsentry/sentry-go/gin v0.48.0
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-contrib/static v1.1.6
 	github.com/gin-gonic/gin v1.12.0
