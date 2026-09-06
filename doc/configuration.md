@@ -82,14 +82,23 @@ You can set up multiple exporters that generate given filetypes to a destination
 `````
 exporter:
     - name: ical_file_exporter              # any distinctive name
-      type: ical                            # currently ical only
-      destination: file                     # any of file or s3
+      type: ical                            # any of ical or jscalendar (see below)
+      destination: file                     # any of file or s3 (see below)
       filename: events                      # the filename to write to (without suffix)
       options:                              # options for the destination
         dir: ./exports
       enabled: false                        # any of true or false
 `````
 
+##### exporter types
+
+- ical: an iCalendar file, to be used with most or all current calendar software
+- jscalendar: a JSCalendar compatible .json file (RFC 8984)
+
+##### exporter destinations
+
+- file: writes the file to the local filesystem
+- s3: uploads the file to an s3 bucket
 
 #### s3 client
 
