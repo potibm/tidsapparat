@@ -80,6 +80,12 @@ func buildFormatter(
 			partyCfg.Timezone,
 			partyCfg.DefaultAddress,
 		), nil
+	case "jscalendar":
+		return formatters.NewJsCalendarFormatter(
+			"-//Tidsapparat//Schedule "+version+"//EN",
+			partyCfg.Timezone,
+			partyCfg.DefaultAddress,
+		), nil
 	default:
 		return nil, errUnknownType
 	}
