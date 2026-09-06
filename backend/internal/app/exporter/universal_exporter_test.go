@@ -14,9 +14,10 @@ import (
 // --- Mocks ---
 
 type mockFormatter struct {
-	data      []byte
-	formatErr error
-	ext       string
+	data        []byte
+	formatErr   error
+	ext         string
+	contentType string
 }
 
 func (m *mockFormatter) Format(entries domain.TimeTable) ([]byte, error) {
@@ -27,22 +28,28 @@ func (m *mockFormatter) Extension() string {
 	return m.ext
 }
 
-type mockWriter struct {
-	writeErr error
-	lastFile string
-	lastData []byte
+func (m *mockFormatter) ContentType() string {
+	return m.contentType
 }
 
-func (m *mockWriter) Write(ctx context.Context, filename string, data []byte) error {
+type mockWriter struct {
+	writeErr        error
+	lastFile        string
+	lastData        []byte
+	lastContentType string
+}
+
+func (m *mockWriter) Write(_ context.Context, filename string, data []byte, contentType string) error {
 	m.lastFile = filename
 	m.lastData = data
+	m.lastContentType = contentType
 
 	return m.writeErr
 }
 
 func TestNewUniversalExporter(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
-	f := &mockFormatter{ext: ".ics"}
+	f := &mockFormatter{ext: ".ics", contentType: "text/calendar; charset=utf-8"}
 	w := &mockWriter{}
 
 	e := NewUniversalExporter("ical", "schedule", f, w, logger)
@@ -52,7 +59,7 @@ func TestNewUniversalExporter(t *testing.T) {
 
 func TestUniversalExporter_Export_Success(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
-	f := &mockFormatter{data: []byte("ical-data"), ext: ".ics"}
+	f := &mockFormatter{data: []byte("ical-data"), ext: ".ics", contentType: "text/calendar; charset=utf-8"}
 	w := &mockWriter{}
 
 	e := NewUniversalExporter("ical", "schedule", f, w, logger)
@@ -63,11 +70,16 @@ func TestUniversalExporter_Export_Success(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "schedule.ics", w.lastFile)
 	assert.Equal(t, []byte("ical-data"), w.lastData)
+	assert.Equal(t, "text/calendar; charset=utf-8", w.lastContentType)
 }
 
 func TestUniversalExporter_Export_FormatError(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
-	f := &mockFormatter{formatErr: errors.New("format failed"), ext: ".ics"}
+	f := &mockFormatter{
+		formatErr:   errors.New("format failed"),
+		ext:         ".ics",
+		contentType: "text/calendar; charset=utf-8",
+	}
 	w := &mockWriter{}
 
 	e := NewUniversalExporter("ical", "schedule", f, w, logger)
@@ -82,7 +94,7 @@ func TestUniversalExporter_Export_FormatError(t *testing.T) {
 
 func TestUniversalExporter_Export_WriteError(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
-	f := &mockFormatter{data: []byte("ical-data"), ext: ".ics"}
+	f := &mockFormatter{data: []byte("ical-data"), ext: ".ics", contentType: "text/calendar; charset=utf-8"}
 	w := &mockWriter{writeErr: errors.New("write failed")}
 
 	e := NewUniversalExporter("ical", "schedule", f, w, logger)

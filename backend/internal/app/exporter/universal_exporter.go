@@ -39,7 +39,7 @@ func (e *UniversalExporter) Export(ctx context.Context, entries domain.TimeTable
 
 	fullFilename := e.filename + e.formatter.Extension()
 
-	err = e.writer.Write(ctx, fullFilename, data)
+	err = e.writer.Write(ctx, fullFilename, data, e.formatter.ContentType())
 	if err != nil {
 		e.logger.Error("Writing failed", "filename", fullFilename, "error", err)
 

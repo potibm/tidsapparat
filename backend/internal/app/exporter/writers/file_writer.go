@@ -15,7 +15,7 @@ type FileWriter struct {
 	BaseDir string
 }
 
-func (w *FileWriter) Write(ctx context.Context, filename string, data []byte) error {
+func (w *FileWriter) Write(_ context.Context, filename string, data []byte, _ string) error {
 	path := filepath.Join(w.BaseDir, filename)
 	if err := os.MkdirAll(w.BaseDir, defaultDirMode); err != nil {
 		return err

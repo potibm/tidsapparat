@@ -30,6 +30,10 @@ func (f *JsCalendarFormatter) Extension() string {
 	return ".json"
 }
 
+func (f *JsCalendarFormatter) ContentType() string {
+	return "application/json; charset=utf-8"
+}
+
 func (f *JsCalendarFormatter) Format(entries domain.TimeTable) ([]byte, error) {
 	var latestUpdate time.Time
 	for _, entry := range entries {

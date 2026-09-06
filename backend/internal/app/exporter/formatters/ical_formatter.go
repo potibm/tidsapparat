@@ -29,6 +29,10 @@ func (f *IcalFormatter) Extension() string {
 	return ".ics"
 }
 
+func (f *IcalFormatter) ContentType() string {
+	return "text/calendar; charset=utf-8"
+}
+
 func (f *IcalFormatter) Format(entries domain.TimeTable) ([]byte, error) {
 	cal := ics.NewCalendar()
 	cal.SetMethod(ics.MethodPublish)
