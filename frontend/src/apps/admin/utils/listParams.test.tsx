@@ -8,6 +8,13 @@ import {
   useListParams,
 } from "react-admin";
 
+// react-admin reads and writes the whole list state (page, perPage, sort,
+// order, filter) through query-string, which is CommonJS and does
+// `require('decode-uri-component')`. Pinning decode-uri-component to an
+// ESM-only release (>=0.5.0) turns that require into a namespace object, so
+// `parse` throws `TypeError: decodeComponent is not a function` on every list
+// render and pagination breaks. Do not add a decode-uri-component override to
+// package.json to silence GHSA-vcc3-ghjq-m6fr; these tests cover that.
 describe("query-string integration", () => {
   it("exposes callable parse and stringify", () => {
     expect(typeof parse).toBe("function");
