@@ -13,6 +13,8 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@mui/icons-material": "^7.3.11",
+    "@mui/material": "^7.3.11",
     "@sentry/react": "^11.0.0",
     "dayjs": "^1.11.23",
     "oidc-client-ts": "^3.5.0",
@@ -54,6 +56,8 @@
     "fsevents@2.3.3": true
   },
   "overrides": {
+    "@mui/system": "^7.3.11",
+    "@mui/utils": "^7.3.11",
     "deepmerge-ts": "^8.0.0"
   }
 }
