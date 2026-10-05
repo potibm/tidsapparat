@@ -2,10 +2,11 @@ package hub
 
 import (
 	"context"
-	"embed"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -35,7 +36,7 @@ const (
 
 type Config struct {
 	Port              int
-	StaticFiles       embed.FS
+	StaticFiles       fs.FS
 	ScheduleEntryRepo repository.ScheduleEntryRepository
 	CategoryRepo      repository.CategoryRepository
 	LocationRepo      repository.LocationRepository
@@ -45,7 +46,7 @@ type Config struct {
 
 type Server struct {
 	port              int
-	staticFiles       embed.FS
+	staticFiles       fs.FS
 	eventHub          *services.EventHub
 	scheduleEntryRepo repository.ScheduleEntryRepository
 	categoryRepo      repository.CategoryRepository
@@ -133,12 +134,12 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 	r.Static("/media", "./data/media")
 	r.Static("/style", "./data/style")
 
-	folder, err := static.EmbedFolder(s.staticFiles, "assets")
+	sub, err := fs.Sub(s.staticFiles, "assets")
 	if err != nil {
 		return nil, fmt.Errorf("create embedded folder: %w", err)
 	}
 
-	r.Use(static.Serve("/", folder))
+	r.Use(static.Serve("/", staticFS{http.FS(sub)}))
 
 	api := r.Group("/api")
 	api.GET("/config", s.handleGetPublicConfig)
@@ -185,18 +186,35 @@ func (s *Server) setupRouter() (*gin.Engine, error) {
 	admin.PUT(pathLocationsWithID, s.updateLocation)
 	admin.DELETE(pathLocationsWithID, s.deleteLocation)
 
-	r.NoRoute(func(c *gin.Context) {
-		if !strings.HasPrefix(c.Request.RequestURI, "/api") && !strings.Contains(c.Request.RequestURI, ".") {
-			file, _ := s.staticFiles.ReadFile("assets/index.html")
-			c.Data(
-				http.StatusOK,
-				"text/html; charset=utf-8",
-				file,
-			)
-		}
-	})
+	r.NoRoute(s.handleSPAFallback)
 
 	return r, nil
+}
+
+func (s *Server) handleSPAFallback(c *gin.Context) {
+	path := c.Request.URL.Path
+
+	if strings.HasPrefix(path, "/api") {
+		return
+	}
+
+	if filepath.Ext(path) != "" {
+		return
+	}
+
+	file, err := fs.ReadFile(s.staticFiles, "assets/index.html")
+	if err != nil {
+		s.logger.Error("Failed to read index.html", "error", err)
+		c.String(http.StatusInternalServerError, "Frontend not found")
+
+		return
+	}
+
+	c.Data(
+		http.StatusOK,
+		"text/html; charset=utf-8",
+		file,
+	)
 }
 
 func (s *Server) registerCorsMiddleware(r *gin.Engine) {
@@ -217,4 +235,18 @@ func (s *Server) createCorsMiddleware() gin.HandlerFunc {
 	corsConfig.AddExposeHeaders("X-Total-Count", "Content-Disposition")
 
 	return cors.New(corsConfig)
+}
+
+type staticFS struct {
+	http.FileSystem
+}
+
+func (s staticFS) Exists(prefix, path string) bool {
+	if len(prefix) > 1 && strings.HasPrefix(path, prefix) {
+		path = strings.TrimPrefix(path, prefix)
+	}
+
+	_, err := s.Open(path)
+
+	return err == nil
 }
