@@ -5,7 +5,7 @@ go 1.27
 require (
 	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/airtrafik/jscal v0.2.1
-	github.com/arran4/golang-ical v0.3.6
+	github.com/arran4/golang-ical v0.3.7
 	github.com/aws/aws-sdk-go-v2 v1.47.1
 	github.com/aws/aws-sdk-go-v2/config v1.33.6
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.6
