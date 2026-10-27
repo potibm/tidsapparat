@@ -100,39 +100,31 @@ services:
       - "traefik.http.routers.redis-tids.tls=true"
       - "traefik.http.services.redis-tids.loadbalancer.server.port=5540"
 
-  minio:
-    image: minio/minio:latest
-    container_name: tidsapparat_minio
+  garage:
+    image: dxflrs/garage:v2.4.1
+    container_name: tidsapparat_garage
     ports:
-      - "3250:9000" # S3 API (Needed for Go backend on host)
+      - "3250:3900" # S3 API (Needed for Go backend on host)
     environment:
-      - MINIO_ROOT_USER=local-admin
-      - MINIO_ROOT_PASSWORD=local-super-secret
-    command: server /data --console-address ":9001"
+      - GARAGE_DEFAULT_ACCESS_KEY=local-admin
+      - GARAGE_DEFAULT_SECRET_KEY=local-super-secret
+      - GARAGE_DEFAULT_BUCKET=tidsapparat-exports
     volumes:
-      - minio_data:/data
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+      - ./infra/garage.toml:/etc/garage.toml:ro
+    entrypoint: ["/garage"]
+    command: ["server", "--single-node", "--default-bucket"]
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minio-tids.rule=Host(`minio.tidsapparat.test`)"
-      - "traefik.http.routers.minio-tids.entrypoints=websecure"
-      - "traefik.http.routers.minio-tids.tls=true"
-      - "traefik.http.services.minio-tids.loadbalancer.server.port=9001"
-
-  minio-init:
-    image: minio/mc
-    container_name: tidsapparat_minio_init
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      until (/usr/bin/mc alias set local_minio http://tidsapparat_minio:9000 local-admin local-super-secret) do echo 'Waiting for MinIO...' && sleep 1; done;
-      /usr/bin/mc mb --ignore-existing local_minio/tidsapparat-exports;
-      /usr/bin/mc anonymous set download local_minio/tidsapparat-exports;
-      exit 0;
-      "
+      - "traefik.http.routers.s3-tids.rule=Host(`s3.tidsapparat.test`)"
+      - "traefik.http.routers.s3-tids.entrypoints=websecure"
+      - "traefik.http.routers.s3-tids.tls=true"
+      - "traefik.http.services.s3-tids.loadbalancer.server.port=3900"
 
 volumes:
   o2_data:
   redis_data:
   redisinsight_data:
-  minio_data:
+  garage_meta:
+  garage_data:
