@@ -141,7 +141,7 @@ services:
     labels:
       - "traefik.docker.network=traefik-global"
 
-  minio:
+  garage:
     networks:
       - default
       - traefik-global
@@ -190,7 +190,7 @@ mkcert -install
 ````
 
 ### A.3 Generate the Certificates
-Navigate to the `certs` directory of your Master-Traefik and generate the certificates for your project. We include a wildcard (`*.`) so that subdomains like `dex.tidsapparat.test` or `minio.tidsapparat.test` are automatically covered by the same certificate:
+Navigate to the `certs` directory of your Master-Traefik and generate the certificates for your project. We include a wildcard (`*.`) so that subdomains like `dex.tidsapparat.test` or `s3.tidsapparat.test` are automatically covered by the same certificate:
 
 ````bash
 cd ~/Projects/traefik-proxy/certs

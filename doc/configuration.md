@@ -113,6 +113,15 @@ s3_client:
     use_path_style: true
 `````
 
+For local development, `mise run infra:up` starts a Garage instance (S3-compatible).
+The written export file can be downloaded with the AWS CLI:
+
+```bash
+AWS_ACCESS_KEY_ID=local-admin AWS_SECRET_ACCESS_KEY=local-super-secret \
+  aws s3 cp s3://tidsapparat-exports/calendar.ical /tmp/ \
+  --endpoint-url http://localhost:3250 --region us-east-1
+```
+
 #### format
 
 Used to localize how dates and times are rendered in the generated feeds or frontend.
