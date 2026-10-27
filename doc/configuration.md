@@ -37,35 +37,35 @@ The yaml consists of those parts:
 
 The app section defines core server settings, database paths, and basic network policies.
 
-````
+```
 app:
     cors_allow_origins:
-        - https://localhost:3300            
+        - https://localhost:3300
     db_filename: tidsapparat
-    env: production 
+    env: production
     frontend_url: https://localhost:3300
     log_format: json
     log_level: info
     redis_url: "redis://pass@localhost:3305"
-````
+```
 
 #### party config
 
 Set up some information on your event.
 
-`````
+```
 party:
     default_address: Prins Jørgens Gård 5, 1218 København K, Denmark
     end_date: "2026-05-17"
     start_date: "2026-05-15"
     timezone: Europe/Copenhagen
-`````
+```
 
 #### event duration
 
 Within the frontend you will see these quicklinks for the event duration:
 
-`````
+```
 event_durations:
     - 0
     - 15
@@ -73,13 +73,13 @@ event_durations:
     - 60
     - 90
     - 120
-`````
+```
 
 #### exporter
 
 You can set up multiple exporters that generate given filetypes to a destination.
 
-`````
+```
 exporter:
     - name: ical_file_exporter              # any distinctive name
       type: ical                            # any of ical or jscalendar (see below)
@@ -88,7 +88,7 @@ exporter:
       options:                              # options for the destination
         dir: ./exports
       enabled: false                        # any of true or false
-`````
+```
 
 ##### exporter types
 
@@ -104,14 +104,14 @@ exporter:
 
 When you are using an exporter that writes to s3, you need to configure it accordingly.
 
-`````
+```
 s3_client:
     access_key_id: accesskey
     secret_access_key: secretkey
     endpoint: http://localhost:9000
     region: us-east-1
     use_path_style: true
-`````
+```
 
 For local development, `mise run infra:up` starts a Garage instance (S3-compatible).
 The written export file can be downloaded with the AWS CLI:
@@ -126,7 +126,7 @@ AWS_ACCESS_KEY_ID=local-admin AWS_SECRET_ACCESS_KEY=local-super-secret \
 
 Used to localize how dates and times are rendered in the generated feeds or frontend.
 
-````
+```
 format:
     date:
         locale: da-DK           # the locale to use to display dates in the frontend
@@ -134,7 +134,7 @@ format:
             hour: 2-digit
             minute: 2-digit
             weekday: short
-````
+```
 
 The date options are according to the documentation at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options.
 
@@ -142,7 +142,7 @@ The date options are according to the documentation at https://developer.mozilla
 
 When using Sentry, provide the project specific DSN and further information here:
 
-`````
+```
 sentry:
     dsn: ""
     environment: production
@@ -150,13 +150,13 @@ sentry:
     replay_session_sample_rate: 0.1
     trace_sample_rate: 0.1
     version: dev
-`````
+```
 
 ## Environment
 
-You can overwrite all the config properties using environment variables. 
+You can overwrite all the config properties using environment variables.
 
-`app.env` translates to `APP_ENV`,  `app.redis_url` to `APP_REDIS_URL` and so on.
+`app.env` translates to `APP_ENV`, `app.redis_url` to `APP_REDIS_URL` and so on.
 
 `APP_CORS_ALLOW_ORIGINS` can be provided as a comma separated list of values.
 
